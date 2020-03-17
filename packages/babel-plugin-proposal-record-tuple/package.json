@@ -1,0 +1,15 @@
+{
+  "name": "@bloomberg/babel-plugin-proposal-record-tuple",
+  "version": "0.0.1",
+  "main": "lib/index.umd.js",
+  "module": "lib/index.esm.js",
+  "dependencies": {
+    "@babel/helper-module-imports": "^7.8.3",
+    "@babel/helper-plugin-utils": "^7.8.3",
+    "@babel/plugin-syntax-record-and-tuple": "^7.9.0",
+    "@babel/core": "^7.9.0"
+  },
+  "scripts": {
+    "clean": "rm -rf ./lib"
+  }
+}

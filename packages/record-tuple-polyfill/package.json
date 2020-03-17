@@ -1,0 +1,9 @@
+{
+  "name": "@bloomberg/record-tuple-polyfill",
+  "version": "0.0.1",
+  "main": "lib/index.umd.js",
+  "module": "lib/index.esm.js",
+  "scripts": {
+    "clean": "rm -rf ./lib"
+  }
+}

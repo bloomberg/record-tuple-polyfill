@@ -1,0 +1,5 @@
+node_modules/
+lerna-debug.log
+packages/*/lib
+packages/*/dist
+!packages/record-and-tuple-playground/src/lib
