@@ -1,5 +1,6 @@
 {
   "name": "@bloomberg/record-tuple-playground",
+  "private": true,
   "version": "0.0.1",
   "dependencies": {
     "@babel/core": "^7.9.0",
