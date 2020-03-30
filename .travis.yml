@@ -1,0 +1,10 @@
+language: node_js
+
+node_js:
+  - "node"
+
+script: 
+  - yarn
+  - yarn bootstrap
+  - yarn lint
+  - yarn test
