@@ -15,6 +15,8 @@ In order to use the polyfill, the environment must support `WeakMap`, [`WeakRef`
 
 # Installation
 
+> Note: the packages described below are not currently published on NPM, as this polyfill is intended to be experimental.
+> If you really want to try the polyfill in it's packaged state, publishing locally via [verdaccio](https://verdaccio.org/) is an excellent option.
 
 To install the transform and polyfill:
 
