@@ -14,10 +14,9 @@
  ** limitations under the License.
  */
 
-import { patch, patchLanguage } from "./patch";
+import "./patch";
 import "regenerator-runtime/runtime";
-patch();
-patchLanguage();
+
 
 import * as Babel from "@babel/core";
 import RecordAndTuple from "@bloomberg/babel-plugin-proposal-record-tuple";
