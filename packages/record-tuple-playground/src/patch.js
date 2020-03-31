@@ -16,7 +16,6 @@
 
 import * as Polyfill from "@bloomberg/record-tuple-polyfill";
 import * as Monaco from "monaco-editor";
-import { LanguageConfigurationRegistry } from "monaco-editor/esm/vs/editor/common/modes/languageConfigurationRegistry";
 import { conf, language } from "./patch-language";
 
 const POLYFILL_DTS = `
@@ -47,7 +46,7 @@ export const Record: RecordConstructor;
 export const Tuple: TupleConstructor;
 `;
 
-export function patch() {
+function patch() {
     // eslint-disable-next-line no-undef
     window.MonacoEnvironment = {
         getWorkerUrl: function(moduleId, label) {
@@ -73,18 +72,13 @@ export function patch() {
     };
 }
 
-export function patchLanguage() {
-    function doPatch() {
-        console.log("patching javascript language support");
-        Monaco.languages.setLanguageConfiguration("javascript", conf);
-        Monaco.languages.setMonarchTokensProvider("javascript", language);
-    }
-
-    let patched = false;
-    LanguageConfigurationRegistry.onDidChange(() => {
-        if (!patched) {
-            patched = true;
-            doPatch();
+function patchLanguage() {
+    Monaco.languages.getLanguages().forEach(lang => {
+        if (lang.id === "typescript" || lang.id === "javascript") {
+            lang.loader = () => Promise.resolve({ conf, language });
         }
     });
 }
+
+patch();
+patchLanguage();
