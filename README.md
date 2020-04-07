@@ -3,7 +3,7 @@
 The [Record and Tuple](https://github.com/tc39/proposal-record-tuple) ECMAScript proposal introduces new deeply immutable value types to JavaScript 
 that have similar access idioms to objects and arrays.
 
-This is an **experiemental and explicitly not production ready** polyfill for the `Record and Tuple` proposal, and a [babel](https://babeljs.io) transform to support using the literal syntax.
+This is an **experimental and explicitly not production ready** polyfill for the `Record and Tuple` proposal, and a [babel](https://babeljs.io) transform to support using the literal syntax.
 
 The polyfill and transform are **constant works in progress** and are not the source of truth for the proposal.
 
@@ -16,7 +16,7 @@ In order to use the polyfill, the environment must support `WeakMap`, [`WeakRef`
 # Installation
 
 > Note: the packages described below are not currently published on NPM, as this polyfill is intended to be experimental.
-> If you really want to try the polyfill in it's packaged state, publishing locally via [verdaccio](https://verdaccio.org/) is an excellent option.
+> If you really want to try the polyfill in its packaged state, publishing locally via [verdaccio](https://verdaccio.org/) is an excellent option.
 
 To install the transform and polyfill:
 
