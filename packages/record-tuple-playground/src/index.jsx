@@ -48,6 +48,15 @@ function debounce(func, wait, immediate) {
     };
 };
 
+const CAN_EVAL = (() => {
+    const WeakRef = globalThis["WeakRef"];
+    const FinalizationRegistry = globalThis["FinalizationRegistry"] || globalThis["FinalizationGroup"];
+    const WeakMap = globalThis["WeakMap"];
+    return WeakRef && FinalizationRegistry && WeakMap;
+})();
+const NO_EVAL_ERROR = "WeakMap, WeakRef, and FinalizationRegistry are required for the Record and Tuple playground\n\n" + 
+	"To enable these experimental features, go to:\n  https://github.com/bloomberg/record-tuple-polyfill#playground";
+
 const CONSOLE_STYLES = {
     LOG_ICON_WIDTH: "0px",
     LOG_ICON_HEIGHT: "0px",
@@ -172,8 +181,9 @@ class App extends React.Component {
             lineDecoratorsWidth: 0,
             lineNumbersMinChars: 0,
             model: undefined,
-            language: "javascript",
+            language: "plaintext",
             readOnly: true,
+            wordWrap: "on",
         });
     }
 
@@ -297,12 +307,16 @@ class App extends React.Component {
     }
 
     run() {
-        try {
-            const func = new Function("console", this.state.output);
-            func(this.fakeConsole);
-        } catch(e) {
-            this.fakeConsole.error(e.message);
-            this.fakeConsole.error(e);
+        if (CAN_EVAL) {
+            try {
+                const func = new Function("console", this.state.output);
+                func(this.fakeConsole);
+            } catch(e) {
+                this.fakeConsole.error(e.message);
+                this.fakeConsole.error(e);
+            }
+        } else {
+            this.setState({ isError: true, output: NO_EVAL_ERROR });
         }
     }
 }

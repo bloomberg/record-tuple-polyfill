@@ -1,5 +1,4 @@
 # Record & Tuple Polyfill
-
 The [Record and Tuple](https://github.com/tc39/proposal-record-tuple) ECMAScript proposal introduces new deeply immutable value types to JavaScript 
 that have similar access idioms to objects and arrays.
 
@@ -65,3 +64,17 @@ console.log(Tuple.from(array));
 
 `typeof` will return an incorrect value when provided a `Record` or `Tuple`. 
 This is because the polyfill implements the proposal via [interning](https://en.wikipedia.org/wiki/String_interning) frozen objects.
+
+# Playground
+
+The Record and Tuple polyfill has been deployed in an easy to use REPL [here](https://rickbutton.github.io/record-tuple-playground/).
+
+## Supported Environments/Browsers
+
+The Record and Tuple polyfill requires several JavaScript features that are only available experimentally in browsers, specifically `WeakRef` and `FinalizationRegistry`. In order to use these experimental features, you must run the browser/environment with specific flags:
+
+| environment     | flags                                    |
+|-----------------|------------------------------------------|
+| node            | --harmony-weak-refs                      |
+| Chrome          | --js-flags="--harmony-weak-refs"         |
+| Firefox Nightly | javascript.options.experimental.weakrefs |
