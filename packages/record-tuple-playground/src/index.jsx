@@ -202,6 +202,7 @@ class App extends React.Component {
                     </div>
                     <div className="right">
                         <span>Record and Tuple Playground</span>
+                        <span><a href="https://tinyurl.com/RecordTupleFeedback">Give Feedback</a></span>
                         <span><a href="https://github.com/tc39/proposal-record-tuple">Proposal</a></span>
                         <span><a href="https://github.com/bloomberg/record-tuple-polyfill">Polyfill</a></span>
                     </div>
