@@ -14,6 +14,36 @@
  ** limitations under the License.
  */
 
+ 
+const SHOULD_SHIM = !(() => {
+    const WeakRef = globalThis["WeakRef"];
+    const FinalizationRegistry = globalThis["FinalizationRegistry"] || globalThis["FinalizationGroup"];
+    const WeakMap = globalThis["WeakMap"];
+    return WeakRef && FinalizationRegistry && WeakMap;
+})();
+
+function shimWeak() {
+    globalThis["WeakRef"] = class WeakRef {
+        constructor(internalSlot) {
+            this.internalSlot = internalSlot;
+        }
+        deref() {
+            return this.internalSlot;
+        }
+    };
+    globalThis["FinalizationRegistry"] = class FinalizationRegistry {
+        constructor() { }
+    };
+}
+
+if (SHOULD_SHIM) {
+    shimWeak();
+}
+
+const SHIMMED_ERROR = "WeakMap, WeakRef, and FinalizationRegistry are required for the Record and Tuple playground\n\n" +
+    "To enable these experimental features, go to:\n  https://github.com/bloomberg/record-tuple-polyfill#playground\n\n" +
+    "We are currently shimming them so you can still run code but please keep in mind that you are currently leaking memory since we can't shim their memory management properties...";
+
 import "./patch";
 import "regenerator-runtime/runtime";
 
@@ -47,15 +77,6 @@ function debounce(func, wait, immediate) {
         if (callNow) func.apply(context, args);
     };
 };
-
-const CAN_EVAL = (() => {
-    const WeakRef = globalThis["WeakRef"];
-    const FinalizationRegistry = globalThis["FinalizationRegistry"] || globalThis["FinalizationGroup"];
-    const WeakMap = globalThis["WeakMap"];
-    return WeakRef && FinalizationRegistry && WeakMap;
-})();
-const NO_EVAL_ERROR = "WeakMap, WeakRef, and FinalizationRegistry are required for the Record and Tuple playground\n\n" + 
-	"To enable these experimental features, go to:\n  https://github.com/bloomberg/record-tuple-polyfill#playground";
 
 const CONSOLE_STYLES = {
     LOG_ICON_WIDTH: "0px",
@@ -153,7 +174,7 @@ class App extends React.Component {
                 }));
             };
             return obj;
-         }, {})
+        }, {})
 
         this.inputModel = monaco.editor.createModel(this.value, "javascript", "file:///index.js");
         this.editorOptions = {
@@ -220,12 +241,12 @@ class App extends React.Component {
                             value={this.state.output} />) : null}
                 </div>
                 <div className="console">
-                    {this.state.isError ? 
+                    {this.state.isError ?
                         (<MonacoEditor
                             options={this.errorOptions}
                             value={this.state.output} />) :
                         this.state.logs.map((l, i) =>
-                            <ObjectInspector key={i} theme="chromeDark" data={l.data.length === 1 ? l.data[0] : l.data}/>)}
+                            <ObjectInspector key={i} theme="chromeDark" data={l.data.length === 1 ? l.data[0] : l.data} />)}
                 </div>
             </div>
         );
@@ -287,7 +308,7 @@ class App extends React.Component {
         const json = JSON.stringify(data);
         const hash = btoa(json);
         console.log("updating hash with new state " + hash);
-        window.location.hash = hash; 
+        window.location.hash = hash;
     }
 
     transform(code, callback) {
@@ -307,16 +328,16 @@ class App extends React.Component {
     }
 
     run() {
-        if (CAN_EVAL) {
-            try {
-                const func = new Function("console", this.state.output);
-                func(this.fakeConsole);
-            } catch(e) {
-                this.fakeConsole.error(e.message);
-                this.fakeConsole.error(e);
-            }
-        } else {
-            this.setState({ isError: true, output: NO_EVAL_ERROR });
+        if (SHOULD_SHIM) {
+            this.fakeConsole.warn(SHIMMED_ERROR);
+        }
+
+        try {
+            const func = new Function("console", this.state.output);
+            func(this.fakeConsole);
+        } catch (e) {
+            this.fakeConsole.error(e.message);
+            this.fakeConsole.error(e);
         }
     }
 }
