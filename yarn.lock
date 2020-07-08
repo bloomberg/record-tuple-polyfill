@@ -2118,6 +2118,11 @@
     semver "^6.3.0"
     tsutils "^3.17.1"
 
+"@ungap/weakrefs@^0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@ungap/weakrefs/-/weakrefs-0.2.0.tgz#cbc3e92ca1d26579736313a210b8d7044c30f009"
+  integrity sha512-6MGYS+dIJG9yzI2j54jwkZZ5sobysMyMVbvQPfDlxBdVNI0OGgbePMNooosUnoYb9YgaJaQ52L45+0T6huIuVA==
+
 "@webassemblyjs/ast@1.9.0":
   version "1.9.0"
   resolved "https://registry.yarnpkg.com/@webassemblyjs/ast/-/ast-1.9.0.tgz#bd850604b4042459a5a41cd7d338cbed695ed964"
