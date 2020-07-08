@@ -333,8 +333,13 @@ class App extends React.Component {
         }
 
         try {
-            const func = new Function("console", this.state.output);
-            func(this.fakeConsole);
+            const rebindPrelude = SHOULD_SHIM ? `
+                globalThis.WeakRef = WeakRef;
+                globalThis.FinalizationRegistry = FinalizationRegistry;
+            ` : "";
+            console.log(rebindPrelude + this.state.output)
+            const func = new Function("console", "WeakRef", "FinalizationRegistry", rebindPrelude + this.state.output);
+            func(this.fakeConsole, globalThis.WeakRef, globalThis.FinalizationRegistry);
         } catch (e) {
             this.fakeConsole.error(e.message);
             this.fakeConsole.error(e);
