@@ -71,7 +71,16 @@ The Record and Tuple polyfill has been deployed in an easy to use REPL [here](ht
 
 ## Supported Environments/Browsers
 
-The Record and Tuple polyfill requires several JavaScript features that are only available experimentally in browsers, specifically `WeakRef` and `FinalizationRegistry`. In order to use these experimental features, you must run the browser/environment with specific flags:
+The Record and Tuple polyfill requires several JavaScript features that are only available experimentally in browsers, specifically `WeakRef` and `FinalizationRegistry`.
+
+The following environments support these experimental features out-of-the-box.
+
+| environment     | supported                                |
+|-----------------|------------------------------------------|
+| [Chrome Canary](https://www.google.com/chrome/canary/)   | :heavy_check_mark:                       |
+
+
+In order to use these experimental features other browsers, you must run the browser/environment with specific flags:
 
 | environment     | flags                                    |
 |-----------------|------------------------------------------|
