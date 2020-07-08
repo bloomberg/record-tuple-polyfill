@@ -13,6 +13,7 @@
     "react-inspector": "^4.0.0",
     "react-monaco-editor": "^0.32.1",
     "@bloomberg/record-tuple-polyfill": "^0.0.1",
+    "@ungap/weakrefs": "^0.2.0",
     "regenerator-runtime": "^0.13.3"
   },
   "scripts": {

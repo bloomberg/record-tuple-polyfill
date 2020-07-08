@@ -14,6 +14,7 @@
  ** limitations under the License.
  */
 
+import "./weakref-polyfill";
 import * as Polyfill from "@bloomberg/record-tuple-polyfill";
 import * as Monaco from "monaco-editor";
 import { conf, language } from "./patch-language";
