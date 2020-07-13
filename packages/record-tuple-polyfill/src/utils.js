@@ -48,19 +48,22 @@ export function unbox(v) {
     }
 }
 
-const RECORD_WEAKMAP = new WeakMap();
-const TUPLE_WEAKMAP = new WeakMap();
+const RECORD_WEAKSET = new WeakSet();
+const TUPLE_WEAKMAP = new WeakMap(); // tuple -> length
 export function isRecord(value) {
-    return RECORD_WEAKMAP.has(value);
+    return RECORD_WEAKSET.has(value);
 }
 export function isTuple(value) {
     return TUPLE_WEAKMAP.has(value);
 }
 export function markRecord(value) {
-    RECORD_WEAKMAP.set(value, true);
+    RECORD_WEAKSET.add(value);
 }
-export function markTuple(value) {
-    TUPLE_WEAKMAP.set(value, true);
+export function markTuple(value, length) {
+    TUPLE_WEAKMAP.set(value, length);
+}
+export function getTupleLength(value) {
+    return TUPLE_WEAKMAP.get(value);
 }
 
 function isRecordOrTuple(value) {

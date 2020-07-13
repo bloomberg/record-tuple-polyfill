@@ -16,6 +16,8 @@
 
 import { Record, Tuple } from "./index";
 
+const hasOwn = Function.call.bind(Object.hasOwnProperty);
+
 test("Tuple creates an tuple with the provides arguments as elements", () => {
     expect(Tuple(1, 2, 3)).toBe(Tuple(1, 2, 3));
 
@@ -53,15 +55,8 @@ test("tuples are correctly identified as tuples", () => {
     expect(Tuple.isTuple(Symbol())).toBe(false);
 });
 
-test("Tuple function creates frozen objects with a non-{enumerable/configurable/writable} length property", () => {
+test("Tuple function creates frozen objects", () => {
     expect(Object.isFrozen(Tuple(1, 2, 3))).toBe(true);
-
-    expect(Object.getOwnPropertyDescriptor(Tuple(1, 2, 3), "length")).toEqual({
-        configurable: false,
-        enumerable: false,
-        value: 3,
-        writable: false,
-    });
 
     expect(Object.isFrozen(Tuple(1, 2, Tuple(3))[2])).toBe(true);
 });
@@ -114,7 +109,6 @@ test("Tuple.of", () => {
 
 describe("all and only the specified prototype methods exist", () => {
     const list = ([str]) => str.trim().split(/\s+/g);
-    const has = Function.call.bind(Object.hasOwnProperty);
 
     // MISSING: valueOf, length, Symbol.toStringTag
     const names = list`
@@ -128,13 +122,56 @@ describe("all and only the specified prototype methods exist", () => {
 
     test.each(names)(".%s", name => {
         // We can't use expect().toHaveProperty because its doesn't support symbols
-        expect(has(Tuple.prototype, name)).toBe(true);
+        expect(hasOwn(Tuple.prototype, name)).toBe(true);
 
         expect(Tuple.prototype[name]).toEqual(expect.any(Function));
     });
 
     test("no extra properties", () => {
         expect(Object.keys(Tuple.prototype)).toHaveLength(names.length);
+    });
+});
+
+describe("Tuple.prototype.length", () => {
+    test("basic behavior", () => {
+        expect(Tuple().length).toBe(0);
+        expect(Tuple(1, 2, 3).length).toBe(3);
+    });
+
+    test("descriptor features", () => {
+        // Not own property
+        expect(hasOwn(Tuple(), "length")).toBe(false);
+
+        // Not enumerable
+        for (let name in Tuple()) expect(name).not.toBe("length");
+
+        // Not writable
+        expect(() => {
+            Tuple.prototype.length = 2;
+        }).toThrow();
+        expect(() => {
+            Tuple(1, 2, 3).length = 2;
+        }).toThrow();
+
+        // Not configurable
+        expect(() => {
+            Object.defineProperty(Tuple.prototype, "length", { value: 0 });
+        }).toThrow();
+    });
+
+    test("this object", () => {
+        expect(() => Tuple.prototype.length).toThrow(TypeError);
+
+        const length = Object.getOwnPropertyDescriptor(
+            Tuple.prototype,
+            "length",
+        ).get;
+
+        expect(length.call(Tuple(1, 2))).toBe(2);
+
+        expect(() => length()).toThrow(TypeError);
+        expect(() => length.call({})).toThrow(TypeError);
+        expect(() => length.call([])).toThrow();
     });
 });
 
