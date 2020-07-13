@@ -119,7 +119,7 @@ Tuple.prototype.popped = function popped() {
 Tuple.prototype.pushed = function pushed(...vals) {
     return createTupleFromIterableObject([...this, ...vals]);
 };
-Tuple.prototype.reverse = function reverse() {
+Tuple.prototype.reversed = function reversed() {
     return createTupleFromIterableObject(Array.from(this).reverse());
 };
 Tuple.prototype.shifted = function shifted() {
@@ -128,12 +128,12 @@ Tuple.prototype.shifted = function shifted() {
 Tuple.prototype.unshifted = function unshifted(...vals) {
     return createTupleFromIterableObject([...vals, ...this]);
 };
-Tuple.prototype.sort = function sort(compareFunction) {
+Tuple.prototype.sorted = function sorted(compareFunction) {
     return createTupleFromIterableObject(
         Array.from(this).sort(compareFunction),
     );
 };
-Tuple.prototype.splice = function splice(start, deleteCount, ...items) {
+Tuple.prototype.spliced = function spliced(start, deleteCount, ...items) {
     return createTupleFromIterableObject(
         Array.from(this).slice(start, deleteCount, ...items),
     );
@@ -153,7 +153,7 @@ Tuple.prototype.join = function join(separator) {
 Tuple.prototype.lastIndexOf = function lastIndexOf(valueToFind, fromIndex) {
     return Array.from(this).lastIndexOf(valueToFind, fromIndex);
 };
-Tuple.prototype.slice = function slice(start, end) {
+Tuple.prototype.sliced = function sliced(start, end) {
     return createTupleFromIterableObject(Array.from(this).slice(start, end));
 };
 Tuple.prototype.toLocaleString = function toLocaleString(locales, options) {
