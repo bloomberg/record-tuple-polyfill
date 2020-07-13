@@ -21,6 +21,7 @@ import {
     isTuple,
     markTuple,
     validateProperty,
+    getTupleLength,
 } from "./utils";
 
 function createFreshTupleFromIterableObject(value) {
@@ -41,15 +42,8 @@ function createFreshTupleFromIterableObject(value) {
         length++;
     }
 
-    Object.defineProperty(tuple, "length", {
-        value: length,
-        writable: false,
-        enumerable: false,
-        configurable: false,
-    });
-
     Object.freeze(tuple);
-    markTuple(tuple);
+    markTuple(tuple, length);
     return tuple;
 }
 
@@ -108,6 +102,19 @@ Tuple.isTuple = isTuple;
 Tuple.of = function of(...values) {
     return createTupleFromIterableObject(Array.of(...values));
 };
+
+Object.defineProperty(Tuple.prototype, "length", {
+    enumerable: false,
+    configurable: false,
+    get: function get_length() {
+        if (!isTuple(this)) {
+            throw new TypeError(
+                "'get Tuple.prototype.length' called on incompatible receiver.",
+            );
+        }
+        return getTupleLength(this);
+    },
+});
 
 Tuple.prototype.popped = function popped() {
     if (this.length <= 1) return Tuple();
