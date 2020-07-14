@@ -103,7 +103,7 @@ describe("stringify", () => {
         obj.bar = obj;
 
         expect(stringify(obj, ["foo", 0, 1, 2])).toMatchInlineSnapshot(
-            `"{\\"foo\\":[null,null,null]}"`,
+            `"{\\"foo\\":[1,2,3]}"`,
         );
     });
 });
