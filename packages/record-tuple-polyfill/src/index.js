@@ -14,14 +14,15 @@
  ** limitations under the License.
  */
 
-import { stringify } from "./json";
+import { stringify, parseImmutable } from "./json";
 
 const _JSON = {
     stringify,
+    parseImmutable,
     parse: JSON.parse,
     [Symbol.toStringTag]: JSON[Symbol.toStringTag],
 };
 
-export { _JSON as JSON, stringify };
+export { _JSON as JSON, stringify, parseImmutable };
 export { Record } from "./record";
 export { Tuple } from "./tuple";

@@ -14,9 +14,12 @@
  ** limitations under the License.
  */
 
-import { isRecord, isTuple } from "./utils";
+import { Record } from "./record";
+import { createTupleFromIterableObject } from "./tuple";
+import { isRecord, isTuple, validateProperty } from "./utils";
 
 const JSON$stringify = JSON.stringify;
+const JSON$parse = JSON.parse;
 
 export function stringify(value, replacer, space) {
     let props;
@@ -54,4 +57,24 @@ export function stringify(value, replacer, space) {
         },
         space,
     );
+}
+
+export function parseImmutable(text, reviver) {
+    return JSON$parse(text, function parseImmutableReviver(key, value) {
+        if (typeof value === "object") {
+            if (Array.isArray(value)) {
+                value = createTupleFromIterableObject(value);
+            } else if (value !== null) {
+                value = Record(value);
+            }
+        }
+
+        // This should check IsCallable(reviver)
+        if (typeof reviver === "function") {
+            value = reviver(key, value);
+            validateProperty(value);
+        }
+
+        return value;
+    });
 }
