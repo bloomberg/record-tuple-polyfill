@@ -16,3 +16,4 @@
 
 export { Record } from "./record";
 export { Tuple } from "./tuple";
+export { stringify } from "./json";
