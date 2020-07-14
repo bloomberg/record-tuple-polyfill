@@ -110,9 +110,9 @@ test("Tuple.of", () => {
 describe("all and only the specified prototype methods exist", () => {
     const list = ([str]) => str.trim().split(/\s+/g);
 
-    // MISSING: valueOf, length, Symbol.toStringTag
+    // MISSING: Symbol.toStringTag
     const names = list`
-        constructor
+        constructor valueOf length
         popped pushed reversed shifted sliced
         sorted spliced concat includes indexOf join
         lastIndexOf entries every filter find findIndex
@@ -124,11 +124,15 @@ describe("all and only the specified prototype methods exist", () => {
         // We can't use expect().toHaveProperty because its doesn't support symbols
         expect(hasOwn(Tuple.prototype, name)).toBe(true);
 
-        expect(Tuple.prototype[name]).toEqual(expect.any(Function));
+        if (name !== "length") {
+            expect(Tuple.prototype[name]).toEqual(expect.any(Function));
+        }
     });
 
     test("no extra properties", () => {
-        expect(Object.keys(Tuple.prototype)).toHaveLength(names.length);
+        expect(Object.getOwnPropertyNames(Tuple.prototype)).toHaveLength(
+            names.length,
+        );
     });
 });
 
