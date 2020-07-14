@@ -14,6 +14,14 @@
  ** limitations under the License.
  */
 
+import { stringify } from "./json";
+
+const _JSON = {
+    stringify,
+    parse: JSON.parse,
+    [Symbol.toStringTag]: JSON[Symbol.toStringTag],
+};
+
+export { _JSON as JSON, stringify };
 export { Record } from "./record";
 export { Tuple } from "./tuple";
-export { stringify } from "./json";
