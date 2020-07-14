@@ -16,6 +16,8 @@
 
 import { isRecord, isTuple } from "./utils";
 
+const JSON$stringify = JSON.stringify;
+
 export function stringify(value, replacer, space) {
     let props;
     if (Array.isArray(replacer)) {
@@ -32,7 +34,7 @@ export function stringify(value, replacer, space) {
         });
     }
 
-    return JSON.stringify(
+    return JSON$stringify(
         value,
         function stringifyReplacer(key, val) {
             if (
