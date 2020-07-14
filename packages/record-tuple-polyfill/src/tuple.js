@@ -90,9 +90,6 @@ Tuple.prototype[Symbol.iterator] = function TupleIterator() {
         },
     };
 };
-Tuple.prototype.toString = function toString() {
-    return "[tuple Tuple]";
-};
 
 Tuple.from = function from(arrayLike, mapFn, thisArg) {
     return createTupleFromIterableObject(Array.from(arrayLike, mapFn, thisArg));
@@ -115,6 +112,14 @@ Object.defineProperty(Tuple.prototype, "length", {
         return getTupleLength(this);
     },
 });
+
+Tuple.prototype.toString = function toString() {
+    return "[tuple Tuple]";
+};
+
+Tuple.prototype.valueOf = function valueOf() {
+    return this;
+};
 
 Tuple.prototype.popped = function popped() {
     if (this.length <= 1) return Tuple();
