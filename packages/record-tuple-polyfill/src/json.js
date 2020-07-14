@@ -34,16 +34,16 @@ export function stringify(value, replacer, space) {
         });
     }
 
+    let isTopLevel = true;
+
     return JSON$stringify(
         value,
         function stringifyReplacer(key, val) {
-            if (
-                props &&
-                val !== value && // The top-level value cannot be excluded
-                !props.has(key)
-            ) {
+            if (props && !isTopLevel && !props.has(key)) {
                 return undefined;
             }
+            isTopLevel = false; // The top-level value is never excluded
+
             if (typeof replacer === "function") {
                 val = replacer.call(this, key, val);
             }

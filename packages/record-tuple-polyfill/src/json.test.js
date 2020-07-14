@@ -33,26 +33,26 @@ describe("stringify", () => {
         });
 
         expect(stringify(value, null, 2)).toMatchInlineSnapshot(`
-        "{
-          \\"bar\\": [
-            \\"a\\",
-            {},
-            []
-          ],
-          \\"foo\\": 2
-        }"
-    `);
+                    "{
+                      \\"bar\\": [
+                        \\"a\\",
+                        {},
+                        []
+                      ],
+                      \\"foo\\": 2
+                    }"
+            `);
 
         expect(stringify(value, null, "hello")).toMatchInlineSnapshot(`
-        "{
-        hello\\"bar\\": [
-        hellohello\\"a\\",
-        hellohello{},
-        hellohello[]
-        hello],
-        hello\\"foo\\": 2
-        }"
-    `);
+                    "{
+                    hello\\"bar\\": [
+                    hellohello\\"a\\",
+                    hellohello{},
+                    hellohello[]
+                    hello],
+                    hello\\"foo\\": 2
+                    }"
+            `);
     });
 
     test("supports the replacer array", () => {
@@ -94,5 +94,16 @@ describe("stringify", () => {
             { key: "b", value: { y: Tuple() } },
             { key: "y", value: Tuple() },
         ]);
+    });
+
+    test("works with circular objects", () => {
+        const obj = {
+            foo: Tuple(1, 2, 3),
+        };
+        obj.bar = obj;
+
+        expect(stringify(obj, ["foo", 0, 1, 2])).toMatchInlineSnapshot(
+            `"{\\"foo\\":[null,null,null]}"`,
+        );
     });
 });
