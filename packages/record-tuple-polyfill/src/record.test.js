@@ -59,14 +59,10 @@ test("Record function creates deeply frozen objects", () => {
 });
 
 test("Record function creates objects with keys in sorted order", () => {
-    expect(Record.keys(Record({ a: 1, b: 2 }))).toBe(Tuple("a", "b"));
-    expect(Record.keys(Record({ b: 1, a: 2 }))).toBe(Tuple("a", "b"));
-    expect(Record.keys(Record({ b: 1, a: 2, 0: 3 }))).toBe(
-        Tuple("0", "a", "b"),
-    );
-    expect(Record.keys(Record({ b: 1, a: 2, 0: 3 }))).toBe(
-        Tuple("0", "a", "b"),
-    );
+    expect(Object.keys(Record({ a: 1, b: 2 }))).toEqual(["a", "b"]);
+    expect(Object.keys(Record({ b: 1, a: 2 }))).toEqual(["a", "b"]);
+    expect(Object.keys(Record({ b: 1, a: 2, 0: 3 }))).toEqual(["0", "a", "b"]);
+    expect(Object.keys(Record({ b: 1, a: 2, 0: 3 }))).toEqual(["0", "a", "b"]);
 });
 
 test("records with the same structural equality will be equal", () => {
@@ -90,25 +86,24 @@ test("Record equality handles -/+0 and NaN correctly", () => {
     expect(Record({ a: NaN })).toBe(Record({ a: NaN }));
 });
 
-test("Record.assign", () => {
-    expect(() => Record.assign(Record({ a: 1 }), { b: 2 })).toThrow();
-    expect(() => Record.assign({ b: 2 }, Record({ a: 1 }))).toThrow();
-
-    expect(Record.assign(Record({ a: 1 }), Record({ b: 2 }))).toBe(
+test("Records can be spread", () => {
+    expect(Record({ ...Record({ a: 1 }), ...Record({ b: 2 }) })).toBe(
         Record({ a: 1, b: 2 }),
     );
-    expect(Record.assign(Record({ a: 1 }), Record({ a: 2 }))).toBe(
+    expect(Record({ ...Record({ a: 1 }), ...Record({ a: 2 }) })).toBe(
         Record({ a: 2 }),
     );
 });
-test("Record.entries", () => {
-    expect(Record.entries(Record({ a: 1 }))).toBe(Tuple(Tuple("a", 1)));
-    expect(Record.entries(Record({ a: 1, b: 2 }))).toBe(
-        Tuple(Tuple("a", 1), Tuple("b", 2)),
-    );
-    expect(Record.entries(Record({ b: 2, a: 1 }))).toBe(
-        Tuple(Tuple("a", 1), Tuple("b", 2)),
-    );
+test("Records work with Object.entries", () => {
+    expect(Object.entries(Record({ a: 1 }))).toEqual([["a", 1]]);
+    expect(Object.entries(Record({ a: 1, b: 2 }))).toEqual([
+        ["a", 1],
+        ["b", 2],
+    ]);
+    expect(Object.entries(Record({ b: 2, a: 1 }))).toEqual([
+        ["a", 1],
+        ["b", 2],
+    ]);
 });
 test("Record.fromEntries", () => {
     expect(
@@ -123,14 +118,16 @@ test("Record.fromEntries", () => {
             ["a", 1],
         ]),
     ).toBe(Record({ a: 1, b: 2 }));
+    expect(() =>
+        Record.fromEntries([
+            ["b", {}],
+            ["a", 1],
+        ]),
+    ).toThrow();
 });
-test("Record.keys", () => {
-    expect(Record.keys(Record({ a: 1, b: 2 }))).toBe(Tuple("a", "b"));
-    expect(Record.keys(Record({ b: 1, a: 2 }))).toBe(Tuple("a", "b"));
-});
-test("Record.values", () => {
-    expect(Record.values(Record({ a: 1, b: 2 }))).toBe(Tuple(1, 2));
-    expect(Record.values(Record({ b: 1, a: 2 }))).toBe(Tuple(2, 1));
+test("Records work with Object.values", () => {
+    expect(Object.values(Record({ a: 1, b: 2 }))).toEqual([1, 2]);
+    expect(Object.values(Record({ b: 1, a: 2 }))).toEqual([2, 1]);
 });
 
 test("Record.prototype.toString", () => {
