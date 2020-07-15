@@ -33,13 +33,11 @@ test("records cannot contain objects", () => {
     expect(() => Record({ a: function() {} })).toThrow();
 });
 
-test("records unbox boxed primitives", () => {
-    expect(Record({ a: Object(true) })).toBe(Record({ a: true }));
-    expect(Record({ a: Object(1) })).toBe(Record({ a: 1 }));
-    expect(Record({ a: Object("test") })).toBe(Record({ a: "test" }));
-
-    const sym = Symbol();
-    expect(Record({ a: Object(sym) })).toBe(Record({ a: sym }));
+test("records doesn't unbox boxed primitives", () => {
+    expect(() => Record({ a: Object(true) })).toThrow(Error); // TODO: TypeError
+    expect(() => Record({ a: Object(1) })).toThrow(Error); // TODO: TypeError
+    expect(() => Record({ a: Object("test") })).toThrow(Error); // TODO: TypeError
+    expect(() => Record({ a: Object(Symbol()) })).toThrow(Error); // TODO: TypeError
 });
 
 test("records are correctly identified as records", () => {
