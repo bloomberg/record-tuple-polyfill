@@ -18,7 +18,6 @@ import { InternGraph, assertFeatures } from "./interngraph";
 import {
     isObject,
     objectFromEntries,
-    unbox,
     validateProperty,
     isRecord,
     markRecord,
@@ -38,16 +37,14 @@ const RECORD_GRAPH = new InternGraph(createFreshRecordFromProperties);
 
 function createRecordFromObject(value) {
     assertFeatures();
-    const unboxed = unbox(value);
-
-    if (!isObject(unboxed)) {
+    if (!isObject(value)) {
         throw new Error("invalid value, expected object argument");
     }
 
     // sort all property names by the order specified by
     // the argument's OwnPropertyKeys internal slot
     // EnumerableOwnPropertyNames - 7.3.22
-    const properties = Object.entries(unboxed)
+    const properties = Object.entries(value)
         .sort(function(a, b) {
             if (a < b) return -1;
             else if (a > b) return 1;

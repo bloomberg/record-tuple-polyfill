@@ -17,7 +17,6 @@
 import { InternGraph, assertFeatures } from "./interngraph";
 import {
     isIterableObject,
-    unbox,
     isTuple,
     markTuple,
     validateProperty,
@@ -25,9 +24,7 @@ import {
 } from "./utils";
 
 function createFreshTupleFromIterableObject(value) {
-    const unboxed = unbox(value);
-
-    if (!isIterableObject(unboxed)) {
+    if (!isIterableObject(value)) {
         throw new Error(
             "invalid value, expected an array or iterable as the argument.",
         );
@@ -37,8 +34,8 @@ function createFreshTupleFromIterableObject(value) {
 
     const tuple = Object.create(Tuple.prototype);
     // eslint-disable-next-line no-constant-condition
-    for (const value of unboxed) {
-        tuple[length] = validateProperty(value);
+    for (const val of value) {
+        tuple[length] = validateProperty(val);
         length++;
     }
 
@@ -54,15 +51,14 @@ const TUPLE_GRAPH = new InternGraph(function(values) {
 
 export function createTupleFromIterableObject(value) {
     assertFeatures();
-    const unboxed = unbox(value);
 
-    if (!isIterableObject(unboxed)) {
+    if (!isIterableObject(value)) {
         throw new Error(
             "invalid value, expected an array or iterable as the argument.",
         );
     }
 
-    const validated = Array.from(unboxed).map(v => [validateProperty(v)]);
+    const validated = Array.from(value).map(v => [validateProperty(v)]);
     return TUPLE_GRAPH.get(validated);
 }
 
@@ -113,9 +109,9 @@ Object.defineProperty(Tuple.prototype, "length", {
     },
 });
 
-Tuple.prototype.toString = function toString() {
-    return "[tuple Tuple]";
-};
+Tuple.prototype[Symbol.toStringTag] = "Tuple";
+Tuple.prototype.toString = Array.prototype.toString;
+Tuple.prototype.toLocaleString = Array.prototype.toLocaleString;
 
 Tuple.prototype.valueOf = function valueOf() {
     return this;
