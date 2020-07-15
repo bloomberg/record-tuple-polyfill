@@ -32,22 +32,6 @@ export function objectFromEntries(iterable) {
     }, {});
 }
 
-export function unbox(v) {
-    if (v instanceof Boolean) {
-        return Boolean.prototype.valueOf.call(v);
-    } else if (v instanceof Number) {
-        return Number.prototype.valueOf.call(v);
-    } else if ("BigInt" in globalThis && v instanceof globalThis["BigInt"]) {
-        return globalThis["BigInt"].prototype.valueOf.call(v);
-    } else if (v instanceof String) {
-        return String.prototype.valueOf.call(v);
-    } else if (v instanceof Symbol) {
-        return Symbol.prototype.valueOf.call(v);
-    } else {
-        return v;
-    }
-}
-
 const RECORD_WEAKSET = new WeakSet();
 const TUPLE_WEAKMAP = new WeakMap(); // tuple -> length
 export function isRecord(value) {
@@ -70,15 +54,14 @@ function isRecordOrTuple(value) {
     return isRecord(value) || isTuple(value);
 }
 export function validateProperty(value) {
-    const unboxed = unbox(value);
-    if (isObject(unboxed) && !isRecordOrTuple(unboxed)) {
+    if (isObject(value) && !isRecordOrTuple(value)) {
         throw new Error(
             "TypeError: cannot use an object as a value in a record",
         );
-    } else if (isFunction(unboxed)) {
+    } else if (isFunction(value)) {
         throw new Error(
             "TypeError: cannot use a function as a value in a record",
         );
     }
-    return unboxed;
+    return value;
 }

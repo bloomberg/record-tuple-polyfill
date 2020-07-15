@@ -35,13 +35,11 @@ test("tuples cannot contain objects", () => {
     expect(() => Tuple(function() {})).toThrow();
 });
 
-test("tuples unbox boxed primitives", () => {
-    expect(Tuple(Object(true))).toBe(Tuple(true));
-    expect(Tuple(Object(1))).toBe(Tuple(1));
-    expect(Tuple(Object("test"))).toBe(Tuple("test"));
-
-    const sym = Symbol();
-    expect(Tuple(Object(sym))).toBe(Tuple(sym));
+test("tuples doesn't unbox boxed primitives", () => {
+    expect(() => Tuple(Object(true))).toThrow(Error); // TODO: TypeError
+    expect(() => Tuple(Object(1))).toThrow(Error); // TODO: TypeError
+    expect(() => Tuple(Object("test"))).toThrow(Error); // TODO: TypeError
+    expect(() => Tuple(Object(Symbol()))).toThrow(Error); // TODO: TypeError
 });
 
 test("tuples are correctly identified as tuples", () => {
