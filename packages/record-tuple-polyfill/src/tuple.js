@@ -34,8 +34,8 @@ function createFreshTupleFromIterableObject(value) {
 
     const tuple = Object.create(Tuple.prototype);
     // eslint-disable-next-line no-constant-condition
-    for (const value of value) {
-        tuple[length] = validateProperty(value);
+    for (const val of value) {
+        tuple[length] = validateProperty(val);
         length++;
     }
 
