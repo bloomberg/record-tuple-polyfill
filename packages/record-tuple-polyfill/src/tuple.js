@@ -113,9 +113,9 @@ Object.defineProperty(Tuple.prototype, "length", {
     },
 });
 
-Tuple.prototype.toString = function toString() {
-    return "[tuple Tuple]";
-};
+Tuple.prototype[Symbol.toStringTag] = "Tuple";
+Tuple.prototype.toString = Array.prototype.toString;
+Tuple.prototype.toLocaleString = Array.prototype.toLocaleString;
 
 Tuple.prototype.valueOf = function valueOf() {
     return this;
