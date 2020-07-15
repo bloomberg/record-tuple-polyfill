@@ -110,29 +110,26 @@ test("Tuple.of", () => {
 describe("all and only the specified prototype methods exist", () => {
     const list = ([str]) => str.trim().split(/\s+/g);
 
-    // MISSING: Symbol.toStringTag
     const names = list`
-        constructor valueOf length
+        constructor valueOf length with
         popped pushed reversed shifted sliced
         sorted spliced concat includes indexOf join
         lastIndexOf entries every filter find findIndex
         forEach keys map reduce reduceRight some
         unshifted toLocaleString toString values
-    `.concat(Symbol.iterator);
+    `.concat(Symbol.iterator, Symbol.toStringTag);
 
     test.each(names)(".%s", name => {
         // We can't use expect().toHaveProperty because its doesn't support symbols
         expect(hasOwn(Tuple.prototype, name)).toBe(true);
 
-        if (name !== "length") {
+        if (name !== "length" && name !== Symbol.toStringTag) {
             expect(Tuple.prototype[name]).toEqual(expect.any(Function));
         }
     });
 
     test("no extra properties", () => {
-        expect(Object.getOwnPropertyNames(Tuple.prototype)).toHaveLength(
-            names.length,
-        );
+        expect(Reflect.ownKeys(Tuple.prototype)).toHaveLength(names.length);
     });
 });
 
@@ -180,7 +177,11 @@ describe("Tuple.prototype.length", () => {
 });
 
 test("Tuple.prototype.toString", () => {
-    expect(Tuple(1, 2, 3).toString()).toEqual("[tuple Tuple]");
+    expect(Tuple(1, 2, 3).toString()).toEqual("1,2,3");
+    expect(Object.prototype.toString.call(Tuple(1, 2, 3))).toEqual(
+        "[object Tuple]",
+    );
+    expect(Tuple.prototype[Symbol.toStringTag]).toBe("Tuple");
 });
 
 test("Tuple.prototype.popped", () => {
