@@ -23,7 +23,6 @@ import {
     isRecord,
     markRecord,
 } from "./utils";
-import { createTupleFromIterableObject } from "./tuple";
 
 function createFreshRecordFromProperties(properties) {
     const record = Object.create(Record.prototype);
@@ -74,28 +73,7 @@ Record.prototype.toString = function toString() {
 };
 
 Record.isRecord = isRecord;
-Record.assign = function assign(...args) {
-    for (const arg of args) {
-        if (!Record.isRecord(arg)) {
-            throw new TypeError(
-                "Cannot assign properties from an object using Record.assign",
-            );
-        }
-    }
 
-    return createRecordFromObject(Object.assign({}, ...args));
-};
-Record.entries = function entries(record) {
-    return createTupleFromIterableObject(
-        Object.entries(record).map(createTupleFromIterableObject),
-    );
-};
 Record.fromEntries = function fromEntries(iterator) {
     return createRecordFromObject(objectFromEntries(iterator));
-};
-Record.keys = function keys(record) {
-    return createTupleFromIterableObject(Object.keys(record));
-};
-Record.values = function values(record) {
-    return createTupleFromIterableObject(Object.values(record));
 };
