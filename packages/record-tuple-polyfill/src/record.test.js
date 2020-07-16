@@ -154,11 +154,11 @@ describe("correct descriptors", () => {
     });
 
     test("Record.length", () => {
-        expect(desc(Record, "name")).toEqual({
+        expect(desc(Record, "length")).toEqual({
             writable: false,
             enumerable: false,
             configurable: true,
-            value: 0,
+            value: 1,
         });
     });
 });
