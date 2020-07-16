@@ -65,3 +65,14 @@ export function validateProperty(value) {
     }
     return value;
 }
+
+export function define(obj, props) {
+    for (const key of Reflect.ownKeys(props)) {
+        const { get, set, value } = Object.getOwnPropertyDescriptor(props, key);
+        let desc =
+            get || set
+                ? { get, set, configurable: true }
+                : { value, writable: true, configurable: true };
+        Object.defineProperty(obj, key, desc);
+    }
+}

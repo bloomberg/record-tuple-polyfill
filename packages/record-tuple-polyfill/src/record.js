@@ -21,6 +21,7 @@ import {
     validateProperty,
     isRecord,
     markRecord,
+    define,
 } from "./utils";
 
 function createFreshRecordFromProperties(properties) {
@@ -61,16 +62,23 @@ export function Record(value) {
 // ensure that Record.name is "Record" even if this
 // source is aggressively minified or bundled.
 if (Record.name !== "Record") {
-    Object.defineProperty(Record, "name", { value: "Record" });
+    Object.defineProperty(Record, "name", {
+        value: "Record",
+        configurable: true,
+    });
 }
+
+define(Record, {
+    isRecord,
+    fromEntries(iterator) {
+        return createRecordFromObject(objectFromEntries(iterator));
+    },
+});
+
 Record.prototype = Object.create(null);
-Record.prototype.constructor = Record;
-Record.prototype.toString = function toString() {
-    return "[record Record]";
-};
-
-Record.isRecord = isRecord;
-
-Record.fromEntries = function fromEntries(iterator) {
-    return createRecordFromObject(objectFromEntries(iterator));
-};
+define(Record.prototype, {
+    constructor: Record,
+    toString() {
+        return "[record Record]";
+    },
+});

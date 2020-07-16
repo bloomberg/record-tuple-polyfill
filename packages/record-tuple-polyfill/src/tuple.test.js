@@ -120,10 +120,6 @@ describe("all and only the specified prototype methods exist", () => {
     test.each(names)(".%s", name => {
         // We can't use expect().toHaveProperty because its doesn't support symbols
         expect(hasOwn(Tuple.prototype, name)).toBe(true);
-
-        if (name !== "length" && name !== Symbol.toStringTag) {
-            expect(Tuple.prototype[name]).toEqual(expect.any(Function));
-        }
     });
 
     test("no extra properties", () => {
@@ -137,25 +133,8 @@ describe("Tuple.prototype.length", () => {
         expect(Tuple(1, 2, 3).length).toBe(3);
     });
 
-    test("descriptor features", () => {
-        // Not own property
+    test("not an own property", () => {
         expect(hasOwn(Tuple(), "length")).toBe(false);
-
-        // Not enumerable
-        for (let name in Tuple()) expect(name).not.toBe("length");
-
-        // Not writable
-        expect(() => {
-            Tuple.prototype.length = 2;
-        }).toThrow();
-        expect(() => {
-            Tuple(1, 2, 3).length = 2;
-        }).toThrow();
-
-        // Not configurable
-        expect(() => {
-            Object.defineProperty(Tuple.prototype, "length", { value: 0 });
-        }).toThrow();
     });
 
     test("this object", () => {
@@ -194,3 +173,65 @@ test("Tuple.prototype.pushed", () => {
     expect(Tuple(1, 2, 3).pushed(4, 5, 6)).toBe(Tuple(1, 2, 3, 4, 5, 6));
 });
 // TODO: Tuple prototype methods
+
+describe("correct descriptors", () => {
+    const desc = Object.getOwnPropertyDescriptor;
+
+    test.each(["isTuple", "of", "from"])("Tuple.%s", name => {
+        expect(desc(Tuple, name)).toEqual({
+            writable: true,
+            enumerable: false,
+            configurable: true,
+            value: expect.any(Function),
+        });
+    });
+
+    test("Tuple.name", () => {
+        expect(desc(Tuple, "name")).toEqual({
+            writable: false,
+            enumerable: false,
+            configurable: true,
+            value: "Tuple",
+        });
+    });
+
+    test("Tuple.length", () => {
+        expect(desc(Tuple, "length")).toEqual({
+            writable: false,
+            enumerable: false,
+            configurable: true,
+            value: 0,
+        });
+    });
+
+    const methods = Reflect.ownKeys(Tuple.prototype).filter(
+        n => n !== "length" && n !== Symbol.toStringTag,
+    );
+
+    test.each(methods)("Tuple.prototype.%s", name => {
+        expect(desc(Tuple.prototype, name)).toEqual({
+            writable: true,
+            enumerable: false,
+            configurable: true,
+            value: expect.any(Function),
+        });
+    });
+
+    test("Tuple.prototype.length", () => {
+        expect(desc(Tuple.prototype, "length")).toEqual({
+            enumerable: false,
+            configurable: true,
+            get: expect.any(Function),
+            set: undefined,
+        });
+    });
+
+    test("Tuple.prototype[Symbol.toStringTag]", () => {
+        expect(desc(Tuple.prototype, Symbol.toStringTag)).toEqual({
+            writable: false,
+            enumerable: false,
+            configurable: true,
+            value: expect.any(String),
+        });
+    });
+});

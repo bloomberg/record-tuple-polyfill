@@ -131,3 +131,34 @@ test("Records work with Object.values", () => {
 test("Record.prototype.toString", () => {
     expect(Record({ a: 1 }).toString()).toEqual("[record Record]");
 });
+
+describe("correct descriptors", () => {
+    const desc = Object.getOwnPropertyDescriptor;
+
+    test.each(["isRecord", "fromEntries"])("Record.%s", name => {
+        expect(desc(Record, name)).toEqual({
+            writable: true,
+            enumerable: false,
+            configurable: true,
+            value: expect.any(Function),
+        });
+    });
+
+    test("Record.name", () => {
+        expect(desc(Record, "name")).toEqual({
+            writable: false,
+            enumerable: false,
+            configurable: true,
+            value: "Record",
+        });
+    });
+
+    test("Record.length", () => {
+        expect(desc(Record, "name")).toEqual({
+            writable: false,
+            enumerable: false,
+            configurable: true,
+            value: 0,
+        });
+    });
+});
