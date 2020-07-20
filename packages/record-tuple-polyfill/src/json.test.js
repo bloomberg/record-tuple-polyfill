@@ -234,5 +234,22 @@ describe("parseImmutable", () => {
             expect(returning(Symbol())).not.toThrow();
             expect(returning(null)).not.toThrow();
         });
+
+        test("this is undefined", () => {
+            const text = `
+                {
+                    "foo": 3
+                }
+            `;
+
+            const receivers = [];
+
+            parseImmutable(text, function(key, value) {
+                receivers.push(this);
+                return value;
+            });
+
+            for (const r of receivers) expect(r).toBeUndefined();
+        });
     });
 });
