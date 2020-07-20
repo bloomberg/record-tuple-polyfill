@@ -21,6 +21,7 @@ import {
     markTuple,
     validateProperty,
     getTupleLength,
+    define,
 } from "./utils";
 
 function createFreshTupleFromIterableObject(value) {
@@ -68,38 +69,36 @@ export function Tuple(...values) {
 // ensure that Tuple.name is "Tuple" even if this
 // source is aggressively minified or bundled.
 if (Tuple.name !== "Tuple") {
-    Object.defineProperty(Tuple, "name", { value: "Tuple" });
+    Object.defineProperty(Tuple, "name", {
+        value: "Tuple",
+        configurable: true,
+    });
 }
+
+define(Tuple, {
+    isTuple,
+
+    from(arrayLike, mapFn, thisArg) {
+        return createTupleFromIterableObject(
+            Array.from(arrayLike, mapFn, thisArg),
+        );
+    },
+    of(...values) {
+        return createTupleFromIterableObject(Array.of(...values));
+    },
+});
+
 Tuple.prototype = Object.create(null);
-Tuple.prototype.constructor = Tuple;
-Tuple.prototype[Symbol.iterator] = function TupleIterator() {
-    let index = 0;
-    return {
-        next: () => {
-            if (index < this.length) {
-                const result = { value: this[index], done: false };
-                index++;
-                return result;
-            } else {
-                return { value: undefined, done: true };
-            }
-        },
-    };
-};
 
-Tuple.from = function from(arrayLike, mapFn, thisArg) {
-    return createTupleFromIterableObject(Array.from(arrayLike, mapFn, thisArg));
-};
-Tuple.isTuple = isTuple;
+Object.defineProperty(Tuple.prototype, Symbol.toStringTag, {
+    value: "Tuple",
+    configurable: true,
+});
 
-Tuple.of = function of(...values) {
-    return createTupleFromIterableObject(Array.of(...values));
-};
+define(Tuple.prototype, {
+    constructor: Tuple,
 
-Object.defineProperty(Tuple.prototype, "length", {
-    enumerable: false,
-    configurable: false,
-    get: function get_length() {
+    get length() {
         if (!isTuple(this)) {
             throw new TypeError(
                 "'get Tuple.prototype.length' called on incompatible receiver.",
@@ -107,75 +106,181 @@ Object.defineProperty(Tuple.prototype, "length", {
         }
         return getTupleLength(this);
     },
+
+    valueOf() {
+        return this;
+    },
+
+    popped() {
+        if (this.length <= 1) return Tuple();
+
+        return createTupleFromIterableObject(
+            Array.from(this).slice(0, this.length - 1),
+        );
+    },
+
+    pushed(...vals) {
+        return createTupleFromIterableObject([...this, ...vals]);
+    },
+
+    reversed() {
+        return createTupleFromIterableObject(Array.from(this).reverse());
+    },
+
+    shifted() {
+        return createTupleFromIterableObject(Array.from(this).slice(1));
+    },
+
+    unshifted(...vals) {
+        return createTupleFromIterableObject([...vals, ...this]);
+    },
+
+    sorted(compareFunction) {
+        return createTupleFromIterableObject(
+            Array.from(this).sort(compareFunction),
+        );
+    },
+
+    spliced(start, deleteCount, ...items) {
+        return createTupleFromIterableObject(
+            Array.from(this).slice(start, deleteCount, ...items),
+        );
+    },
+
+    concat(...values) {
+        return createTupleFromIterableObject(
+            Array.from(this).concat(...values),
+        );
+    },
+
+    includes(valueToFind, fromIndex) {
+        return Array.from(this).includes(valueToFind, fromIndex);
+    },
+
+    indexOf(valueToFind, fromIndex) {
+        return Array.from(this).indexOf(valueToFind, fromIndex);
+    },
+
+    join(separator) {
+        return Array.from(this).join(separator);
+    },
+
+    lastIndexOf(valueToFind, fromIndex) {
+        return Array.from(this).lastIndexOf(valueToFind, fromIndex);
+    },
+
+    sliced(start, end) {
+        return createTupleFromIterableObject(
+            Array.from(this).slice(start, end),
+        );
+    },
+
+    entries() {
+        return createTupleFromIterableObject(
+            Array.from(this)
+                .entries()
+                .map(e => createTupleFromIterableObject(e)),
+        )[Symbol.iterator]();
+    },
+
+    every(callback, thisArg) {
+        return Array.from(this).every(
+            wrapTupleCallback(this, callback),
+            thisArg,
+        );
+    },
+
+    filter(callback, thisArg) {
+        return createTupleFromIterableObject(
+            Array.from(this).filter(wrapTupleCallback(this, callback), thisArg),
+        );
+    },
+
+    find(callback, thisArg) {
+        return Array.from(this).find(
+            wrapTupleCallback(this, callback),
+            thisArg,
+        );
+    },
+
+    findIndex(callback, thisArg) {
+        return Array.from(this).findIndex(
+            wrapTupleCallback(this, callback),
+            thisArg,
+        );
+    },
+
+    forEach(callback, thisArg) {
+        return Array.from(this).forEach(
+            wrapTupleCallback(this, callback),
+            thisArg,
+        );
+    },
+
+    keys() {
+        return createTupleFromIterableObject(Array.from(this).keys())[
+            Symbol.iterator
+        ]();
+    },
+
+    map(callback, thisArg) {
+        return createTupleFromIterableObject(
+            Array.from(this).map(wrapTupleCallback(this, callback), thisArg),
+        );
+    },
+
+    reduce(callback, initialValue) {
+        return Array.from(this).reduce(
+            wrapTupleReduceCallback(this, callback),
+            initialValue,
+        );
+    },
+
+    reduceRight(callback, initialValue) {
+        return Array.from(this).reduceRight(
+            wrapTupleReduceCallback(this, callback),
+            initialValue,
+        );
+    },
+
+    some(callback, thisArg) {
+        return Array.from(this).some(
+            wrapTupleCallback(this, callback),
+            thisArg,
+        );
+    },
+
+    values() {
+        return this[Symbol.iterator]();
+    },
+
+    with(index, value) {
+        if (typeof index !== "number")
+            throw new TypeError(`index provided to .with() must be a number`);
+
+        const array = Array.from(this);
+        array[index] = value;
+        return createTupleFromIterableObject(array);
+    },
+
+    toString: Array.prototype.toString,
+    toLocaleString: Array.prototype.toLocaleString,
+
+    [Symbol.iterator]() {
+        let index = 0;
+        return {
+            next: () => {
+                if (index < this.length) {
+                    const result = { value: this[index], done: false };
+                    index++;
+                    return result;
+                } else {
+                    return { value: undefined, done: true };
+                }
+            },
+        };
+    },
 });
-
-Tuple.prototype[Symbol.toStringTag] = "Tuple";
-Tuple.prototype.toString = Array.prototype.toString;
-Tuple.prototype.toLocaleString = Array.prototype.toLocaleString;
-
-Tuple.prototype.valueOf = function valueOf() {
-    return this;
-};
-
-Tuple.prototype.popped = function popped() {
-    if (this.length <= 1) return Tuple();
-
-    return createTupleFromIterableObject(
-        Array.from(this).slice(0, this.length - 1),
-    );
-};
-Tuple.prototype.pushed = function pushed(...vals) {
-    return createTupleFromIterableObject([...this, ...vals]);
-};
-Tuple.prototype.reversed = function reversed() {
-    return createTupleFromIterableObject(Array.from(this).reverse());
-};
-Tuple.prototype.shifted = function shifted() {
-    return createTupleFromIterableObject(Array.from(this).slice(1));
-};
-Tuple.prototype.unshifted = function unshifted(...vals) {
-    return createTupleFromIterableObject([...vals, ...this]);
-};
-Tuple.prototype.sorted = function sorted(compareFunction) {
-    return createTupleFromIterableObject(
-        Array.from(this).sort(compareFunction),
-    );
-};
-Tuple.prototype.spliced = function spliced(start, deleteCount, ...items) {
-    return createTupleFromIterableObject(
-        Array.from(this).slice(start, deleteCount, ...items),
-    );
-};
-Tuple.prototype.concat = function concat(...values) {
-    return createTupleFromIterableObject(Array.from(this).concat(...values));
-};
-Tuple.prototype.includes = function includes(valueToFind, fromIndex) {
-    return Array.from(this).includes(valueToFind, fromIndex);
-};
-Tuple.prototype.indexOf = function indexOf(valueToFind, fromIndex) {
-    return Array.from(this).indexOf(valueToFind, fromIndex);
-};
-Tuple.prototype.join = function join(separator) {
-    return Array.from(this).join(separator);
-};
-Tuple.prototype.lastIndexOf = function lastIndexOf(valueToFind, fromIndex) {
-    return Array.from(this).lastIndexOf(valueToFind, fromIndex);
-};
-Tuple.prototype.sliced = function sliced(start, end) {
-    return createTupleFromIterableObject(Array.from(this).slice(start, end));
-};
-Tuple.prototype.toLocaleString = function toLocaleString(locales, options) {
-    return createTupleFromIterableObject(
-        Array.from(this).toLocaleString(locales, options),
-    );
-};
-Tuple.prototype.entries = function entries() {
-    return createTupleFromIterableObject(
-        Array.from(this)
-            .entries()
-            .map(e => createTupleFromIterableObject(e)),
-    )[Symbol.iterator]();
-};
 
 function wrapTupleCallback(tuple, callback) {
     return function(element, index) {
@@ -187,59 +292,3 @@ function wrapTupleReduceCallback(tuple, callback) {
         return callback.call(this, accumulator, element, index, tuple);
     };
 }
-Tuple.prototype.every = function every(callback, thisArg) {
-    return Array.from(this).every(wrapTupleCallback(this, callback), thisArg);
-};
-Tuple.prototype.filter = function filter(callback, thisArg) {
-    return createTupleFromIterableObject(
-        Array.from(this).filter(wrapTupleCallback(this, callback), thisArg),
-    );
-};
-Tuple.prototype.find = function find(callback, thisArg) {
-    return Array.from(this).find(wrapTupleCallback(this, callback), thisArg);
-};
-Tuple.prototype.findIndex = function findIndex(callback, thisArg) {
-    return Array.from(this).findIndex(
-        wrapTupleCallback(this, callback),
-        thisArg,
-    );
-};
-Tuple.prototype.forEach = function forEach(callback, thisArg) {
-    return Array.from(this).forEach(wrapTupleCallback(this, callback), thisArg);
-};
-Tuple.prototype.keys = function keys() {
-    return createTupleFromIterableObject(Array.from(this).keys())[
-        Symbol.iterator
-    ]();
-};
-Tuple.prototype.map = function map(callback, thisArg) {
-    return createTupleFromIterableObject(
-        Array.from(this).map(wrapTupleCallback(this, callback), thisArg),
-    );
-};
-Tuple.prototype.reduce = function reduce(callback, initialValue) {
-    return Array.from(this).reduce(
-        wrapTupleReduceCallback(this, callback),
-        initialValue,
-    );
-};
-Tuple.prototype.reduceRight = function reduceRight(callback, initialValue) {
-    return Array.from(this).reduceRight(
-        wrapTupleReduceCallback(this, callback),
-        initialValue,
-    );
-};
-Tuple.prototype.some = function some(callback, thisArg) {
-    return Array.from(this).some(wrapTupleCallback(this, callback), thisArg);
-};
-Tuple.prototype.values = function values() {
-    return this[Symbol.iterator]();
-};
-Tuple.prototype.with = function(index, value) {
-    if (typeof index !== "number")
-        throw new TypeError(`index provided to .with() must be a number`);
-
-    const array = Array.from(this);
-    array[index] = value;
-    return createTupleFromIterableObject(array);
-};
