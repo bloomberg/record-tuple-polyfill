@@ -14,7 +14,7 @@
  ** limitations under the License.
  */
 
-import { Record, Tuple, stringify } from "./";
+import { Record, Tuple, stringify, parseImmutable } from "./";
 
 describe("stringify", () => {
     test("supports records and tuples", () => {
@@ -105,5 +105,151 @@ describe("stringify", () => {
         expect(stringify(obj, ["foo", 0, 1, 2])).toMatchInlineSnapshot(
             `"{\\"foo\\":[1,2,3]}"`,
         );
+    });
+});
+
+describe("parseImmutable", () => {
+    describe("it works with any JSON value", () => {
+        const cases = ["1", "0.3", "true", "false", "null", '"aaa"'];
+
+        test.each(cases)("primitive %s", text => {
+            expect(parseImmutable(text)).toBe(JSON.parse(text));
+        });
+
+        test("JSON objects and arrays", () => {
+            const text = `
+                {
+                    "foo": {
+                        "bar": [{ "baz": [] }, {}]
+                    }
+                }
+            `;
+
+            const expected = Record({
+                foo: Record({
+                    bar: Tuple(Record({ baz: Tuple() }), Record({})),
+                }),
+            });
+
+            expect(parseImmutable(text)).toBe(expected);
+        });
+    });
+
+    describe("reviver function", () => {
+        test("only receives immutable values", () => {
+            const text = `
+                {
+                    "foo": {
+                        "bar": [{ "baz": 42 }, false]
+                    }
+                }
+            `;
+
+            const converted = Record({
+                foo: Record({
+                    bar: Tuple(Record({ baz: 42 }), false),
+                }),
+            });
+
+            const calls = [];
+
+            parseImmutable(text, (key, value) => {
+                calls.push({ key, value });
+                return value;
+            });
+
+            expect(calls).toEqual([
+                { key: "baz", value: 42 },
+                { key: "0", value: converted.foo.bar[0] },
+                { key: "1", value: false },
+                { key: "bar", value: converted.foo.bar },
+                { key: "foo", value: converted.foo },
+                { key: "", value: converted },
+            ]);
+        });
+
+        test("can return a different value", () => {
+            const test = `
+            {
+                "foo": 1,
+                "bar": 2,
+                "baz": 3,
+                "asd": [{ "x": 4 }]
+            }
+            `;
+
+            const reviver = (key, value) => {
+                if (value === 1) return BigInt("1");
+                if (value === 2) return Record({ foo: Tuple(2, 3) });
+                if (value === 3) return "aaa";
+                if (value === 4) return 2;
+                return value;
+            };
+
+            const expected = Record({
+                foo: BigInt("1"),
+                bar: Record({ foo: Tuple(2, 3) }),
+                baz: "aaa",
+                asd: Tuple(Record({ x: 2 })),
+            });
+
+            expect(parseImmutable(test, reviver)).toBe(expected);
+        });
+
+        test("can return undefined to remove properties", () => {
+            const test = `
+            {
+                "foo": 1,
+                "bar": 2,
+                "baz": 3,
+                "asd": [1, 2, 3]
+            }
+            `;
+
+            const reviver = (key, value) => {
+                if (value === 2) return;
+                if (key === "baz") return null; // not removed
+                return value;
+            };
+
+            const expected = Record({
+                foo: 1,
+                baz: null,
+                asd: Tuple(1, undefined, 3),
+            });
+
+            expect(parseImmutable(test, reviver)).toBe(expected);
+        });
+
+        test("cannot return mutable values", () => {
+            const returning = val => {
+                return () => parseImmutable("{}", () => val);
+            };
+
+            expect(returning({})).toThrow(Error); // TODO: TypeError
+            expect(returning([])).toThrow(Error);
+            expect(returning(/a/)).toThrow(Error);
+            //expect(returning(new String(""))).toThrow(Error);
+
+            expect(returning(Symbol())).not.toThrow();
+            expect(returning(null)).not.toThrow();
+        });
+
+        test("this is undefined", () => {
+            const text = `
+                {
+                    "foo": 3
+                }
+            `;
+
+            const receivers = [];
+
+            parseImmutable(text, function(key, value) {
+                receivers.push(this);
+                return value;
+            });
+
+            for (const r of receivers) expect(r).toBeUndefined();
+        });
     });
 });
