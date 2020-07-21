@@ -110,7 +110,7 @@ describe("all and only the specified prototype methods exist", () => {
 
     const names = list`
         constructor valueOf length with
-        popped pushed reversed shifted sliced
+        popped pushed reversed shifted slice
         sorted spliced concat includes indexOf join
         lastIndexOf entries every filter find findIndex
         forEach keys map reduce reduceRight some
