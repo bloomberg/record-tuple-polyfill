@@ -166,7 +166,8 @@ define(Tuple.prototype, {
 
     values: arrayMethod("values"),
 
-    toString: Array.prototype.toString,
+    toString: arrayMethod("toString"),
+
     toLocaleString: arrayMethod("toLocaleString"),
 
     with(index, value) {
