@@ -159,18 +159,32 @@ test("Tuple.prototype.toString", () => {
         "[object Tuple]",
     );
     expect(Tuple.prototype[Symbol.toStringTag]).toBe("Tuple");
+    expect(() => Tuple.prototype.toString.call([])).toThrow(TypeError);
 });
 
 test("Tuple.prototype.popped", () => {
     expect(Tuple().popped()).toBe(Tuple());
     expect(Tuple(1).popped()).toBe(Tuple());
     expect(Tuple(1, 2, 3).popped()).toBe(Tuple(1, 2));
+    expect(() => Tuple.prototype.popped.call([1, 2, 3])).toThrow(TypeError);
 });
 test("Tuple.prototype.pushed", () => {
     expect(Tuple().pushed()).toBe(Tuple());
     expect(Tuple().pushed(undefined)).toBe(Tuple(undefined));
     expect(Tuple().pushed(1, 2, 3)).toBe(Tuple(1, 2, 3));
     expect(Tuple(1, 2, 3).pushed(4, 5, 6)).toBe(Tuple(1, 2, 3, 4, 5, 6));
+});
+test("Tuple.prototype.map", () => {
+    expect(Tuple(1, 2, 3).map(x => 2 * x)).toBe(Tuple(2, 4, 6));
+    expect(() => Tuple.prototype.map.call([1, 2, 3], x => 2 * x)).toThrow(
+        TypeError,
+    );
+});
+test("Tuple.prototype.every", () => {
+    expect(Tuple(1, 2, 3).every(x => x > 0)).toBe(true);
+    expect(() => Tuple.prototype.every.call([1, 2, 3], x => x > 0)).toThrow(
+        TypeError,
+    );
 });
 // TODO: Tuple prototype methods
 
