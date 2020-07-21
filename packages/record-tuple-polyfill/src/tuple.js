@@ -116,49 +116,19 @@ define(Tuple.prototype, {
         return this;
     },
 
-    popped() {
-        assertTuple(this, "popped");
+    popped: arrayMethodUpdatingTuple("pop", "popped"),
 
-        if (this.length <= 1) return Tuple();
+    pushed: arrayMethodUpdatingTuple("push", "pushed"),
 
-        return createTupleFromIterableObject(
-            Array.from(this).slice(0, this.length - 1),
-        );
-    },
+    reversed: arrayMethodUpdatingTuple("reverse", "reversed"),
 
-    pushed(...vals) {
-        assertTuple(this, "pushed");
-        return createTupleFromIterableObject([...this, ...vals]);
-    },
+    shifted: arrayMethodUpdatingTuple("shift", "shifted"),
 
-    reversed() {
-        assertTuple(this, "reversed");
-        return createTupleFromIterableObject(Array.from(this).reverse());
-    },
+    unshifted: arrayMethodUpdatingTuple("unshift", "unshifted"),
 
-    shifted() {
-        assertTuple(this, "shifted");
-        return createTupleFromIterableObject(Array.from(this).slice(1));
-    },
+    sorted: arrayMethodUpdatingTuple("sort", "sorted"),
 
-    unshifted(...vals) {
-        assertTuple(this, "unshifted");
-        return createTupleFromIterableObject([...vals, ...this]);
-    },
-
-    sorted(compareFunction) {
-        assertTuple(this, "sorted");
-        return createTupleFromIterableObject(
-            Array.from(this).sort(compareFunction),
-        );
-    },
-
-    spliced(start, deleteCount, ...items) {
-        assertTuple(this, "spliced");
-        return createTupleFromIterableObject(
-            Array.from(this).slice(start, deleteCount, ...items),
-        );
-    },
+    spliced: arrayMethodUpdatingTuple("splice", "spliced"),
 
     concat: arrayMethodReturningTuple("concat"),
 
@@ -170,21 +140,9 @@ define(Tuple.prototype, {
 
     lastIndexOf: arrayMethod("lastIndexOf"),
 
-    sliced(start, end) {
-        assertTuple(this, "sliced");
-        return createTupleFromIterableObject(
-            Array.from(this).slice(start, end),
-        );
-    },
+    slice: arrayMethodReturningTuple("slice"),
 
-    entries() {
-        assertTuple(this, "entries");
-        return createTupleFromIterableObject(
-            Array.from(this)
-                .entries()
-                .map(e => createTupleFromIterableObject(e)),
-        )[Symbol.iterator]();
-    },
+    entries: arrayMethod("entries"),
 
     every: arrayMethod("every"),
 
@@ -196,12 +154,7 @@ define(Tuple.prototype, {
 
     forEach: arrayMethod("forEach"),
 
-    keys() {
-        assertTuple(this, "keys");
-        return createTupleFromIterableObject(Array.from(this).keys())[
-            Symbol.iterator
-        ]();
-    },
+    keys: arrayMethod("keys"),
 
     map: arrayMethodReturningTuple("map"),
 
@@ -211,10 +164,10 @@ define(Tuple.prototype, {
 
     some: arrayMethod("some"),
 
-    values() {
-        assertTuple(this, "values");
-        return this[Symbol.iterator]();
-    },
+    values: arrayMethod("values"),
+
+    toString: Array.prototype.toString,
+    toLocaleString: arrayMethod("toLocaleString"),
 
     with(index, value) {
         assertTuple(this, "with");
@@ -226,26 +179,13 @@ define(Tuple.prototype, {
         array[index] = value;
         return createTupleFromIterableObject(array);
     },
-
-    toString: Array.prototype.toString,
-    toLocaleString: arrayMethod("toLocaleString"),
-
-    [Symbol.iterator]() {
-        let index = 0;
-        return {
-            next: () => {
-                if (index < this.length) {
-                    const result = { value: this[index], done: false };
-                    index++;
-                    return result;
-                } else {
-                    return { value: undefined, done: true };
-                }
-            },
-        };
-    },
 });
 
+define(Tuple.prototype, {
+    [Symbol.iterator]: Tuple.prototype.values,
+});
+
+// Array methods that already work as-is with tuples
 function arrayMethod(name) {
     const method = Array.prototype[name];
     return function() {
@@ -254,10 +194,22 @@ function arrayMethod(name) {
     };
 }
 
+// Array methods that return an array, but should return a tuple
 function arrayMethodReturningTuple(name) {
     const method = Array.prototype[name];
     return function() {
         assertTuple(this, name);
         return createTupleFromIterableObject(method.apply(this, arguments));
+    };
+}
+
+// Array methods that would try to mutate the existing tuple
+function arrayMethodUpdatingTuple(name, newName) {
+    const method = Array.prototype[name];
+    return function() {
+        assertTuple(this, newName);
+        const arr = Array.from(this);
+        method.apply(arr, arguments);
+        return createTupleFromIterableObject(arr);
     };
 }
