@@ -63,6 +63,14 @@ export function createTupleFromIterableObject(value) {
     return TUPLE_GRAPH.get(validated);
 }
 
+function assertTuple(value, methodName) {
+    if (!isTuple(value)) {
+        throw new TypeError(
+            `'Tuple.prototype.${methodName}' called on incompatible receiver.`,
+        );
+    }
+}
+
 export function Tuple(...values) {
     return createTupleFromIterableObject(values);
 }
@@ -99,19 +107,18 @@ define(Tuple.prototype, {
     constructor: Tuple,
 
     get length() {
-        if (!isTuple(this)) {
-            throw new TypeError(
-                "'get Tuple.prototype.length' called on incompatible receiver.",
-            );
-        }
+        assertTuple(this, "length");
         return getTupleLength(this);
     },
 
     valueOf() {
+        assertTuple(this, "valueOf");
         return this;
     },
 
     popped() {
+        assertTuple(this, "popped");
+
         if (this.length <= 1) return Tuple();
 
         return createTupleFromIterableObject(
@@ -120,62 +127,58 @@ define(Tuple.prototype, {
     },
 
     pushed(...vals) {
+        assertTuple(this, "pushed");
         return createTupleFromIterableObject([...this, ...vals]);
     },
 
     reversed() {
+        assertTuple(this, "reversed");
         return createTupleFromIterableObject(Array.from(this).reverse());
     },
 
     shifted() {
+        assertTuple(this, "shifted");
         return createTupleFromIterableObject(Array.from(this).slice(1));
     },
 
     unshifted(...vals) {
+        assertTuple(this, "unshifted");
         return createTupleFromIterableObject([...vals, ...this]);
     },
 
     sorted(compareFunction) {
+        assertTuple(this, "sorted");
         return createTupleFromIterableObject(
             Array.from(this).sort(compareFunction),
         );
     },
 
     spliced(start, deleteCount, ...items) {
+        assertTuple(this, "spliced");
         return createTupleFromIterableObject(
             Array.from(this).slice(start, deleteCount, ...items),
         );
     },
 
-    concat(...values) {
-        return createTupleFromIterableObject(
-            Array.from(this).concat(...values),
-        );
-    },
+    concat: arrayMethodReturningTuple("concat"),
 
-    includes(valueToFind, fromIndex) {
-        return Array.from(this).includes(valueToFind, fromIndex);
-    },
+    includes: arrayMethod("includes"),
 
-    indexOf(valueToFind, fromIndex) {
-        return Array.from(this).indexOf(valueToFind, fromIndex);
-    },
+    indexOf: arrayMethod("indexOf"),
 
-    join(separator) {
-        return Array.from(this).join(separator);
-    },
+    join: arrayMethod("join"),
 
-    lastIndexOf(valueToFind, fromIndex) {
-        return Array.from(this).lastIndexOf(valueToFind, fromIndex);
-    },
+    lastIndexOf: arrayMethod("lastIndexOf"),
 
     sliced(start, end) {
+        assertTuple(this, "sliced");
         return createTupleFromIterableObject(
             Array.from(this).slice(start, end),
         );
     },
 
     entries() {
+        assertTuple(this, "entries");
         return createTupleFromIterableObject(
             Array.from(this)
                 .entries()
@@ -183,78 +186,39 @@ define(Tuple.prototype, {
         )[Symbol.iterator]();
     },
 
-    every(callback, thisArg) {
-        return Array.from(this).every(
-            wrapTupleCallback(this, callback),
-            thisArg,
-        );
-    },
+    every: arrayMethod("every"),
 
-    filter(callback, thisArg) {
-        return createTupleFromIterableObject(
-            Array.from(this).filter(wrapTupleCallback(this, callback), thisArg),
-        );
-    },
+    filter: arrayMethodReturningTuple("filter"),
 
-    find(callback, thisArg) {
-        return Array.from(this).find(
-            wrapTupleCallback(this, callback),
-            thisArg,
-        );
-    },
+    find: arrayMethod("find"),
 
-    findIndex(callback, thisArg) {
-        return Array.from(this).findIndex(
-            wrapTupleCallback(this, callback),
-            thisArg,
-        );
-    },
+    findIndex: arrayMethod("findIndex"),
 
-    forEach(callback, thisArg) {
-        return Array.from(this).forEach(
-            wrapTupleCallback(this, callback),
-            thisArg,
-        );
-    },
+    forEach: arrayMethod("forEach"),
 
     keys() {
+        assertTuple(this, "keys");
         return createTupleFromIterableObject(Array.from(this).keys())[
             Symbol.iterator
         ]();
     },
 
-    map(callback, thisArg) {
-        return createTupleFromIterableObject(
-            Array.from(this).map(wrapTupleCallback(this, callback), thisArg),
-        );
-    },
+    map: arrayMethodReturningTuple("map"),
 
-    reduce(callback, initialValue) {
-        return Array.from(this).reduce(
-            wrapTupleReduceCallback(this, callback),
-            initialValue,
-        );
-    },
+    reduce: arrayMethod("reduce"),
 
-    reduceRight(callback, initialValue) {
-        return Array.from(this).reduceRight(
-            wrapTupleReduceCallback(this, callback),
-            initialValue,
-        );
-    },
+    reduceRight: arrayMethod("reduceRight"),
 
-    some(callback, thisArg) {
-        return Array.from(this).some(
-            wrapTupleCallback(this, callback),
-            thisArg,
-        );
-    },
+    some: arrayMethod("some"),
 
     values() {
+        assertTuple(this, "values");
         return this[Symbol.iterator]();
     },
 
     with(index, value) {
+        assertTuple(this, "with");
+
         if (typeof index !== "number")
             throw new TypeError(`index provided to .with() must be a number`);
 
@@ -264,7 +228,7 @@ define(Tuple.prototype, {
     },
 
     toString: Array.prototype.toString,
-    toLocaleString: Array.prototype.toLocaleString,
+    toLocaleString: arrayMethod("toLocaleString"),
 
     [Symbol.iterator]() {
         let index = 0;
@@ -282,13 +246,18 @@ define(Tuple.prototype, {
     },
 });
 
-function wrapTupleCallback(tuple, callback) {
-    return function(element, index) {
-        return callback.call(this, element, index, tuple);
+function arrayMethod(name) {
+    const method = Array.prototype[name];
+    return function() {
+        assertTuple(this, name);
+        return method.apply(this, arguments);
     };
 }
-function wrapTupleReduceCallback(tuple, callback) {
-    return function(accumulator, element, index) {
-        return callback.call(this, accumulator, element, index, tuple);
+
+function arrayMethodReturningTuple(name) {
+    const method = Array.prototype[name];
+    return function() {
+        assertTuple(this, name);
+        return createTupleFromIterableObject(method.apply(this, arguments));
     };
 }
