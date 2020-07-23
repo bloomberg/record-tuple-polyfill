@@ -39,8 +39,8 @@
     "watch-playground": "webpack --watch --mode development",
     "lint": "eslint .",
     "fix": "eslint . --fix",
-    "test": "node --harmony-weak-refs --expose-gc node_modules/jest/bin/jest.js",
-    "test-watch": "node --harmony-weak-refs --expose-gc node_modules/jest/bin/jest.js --watch",
+    "test": "node --harmony-weak-refs-with-cleanup-some --expose-gc node_modules/jest/bin/jest.js",
+    "test-watch": "node --harmony-weak-refs-with-cleanup-some --expose-gc node_modules/jest/bin/jest.js --watch",
     "repl": "node --harmony-weak-refs scripts/repl.js"
   },
   "dependencies": {},
