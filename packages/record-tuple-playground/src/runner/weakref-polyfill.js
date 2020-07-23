@@ -3,10 +3,10 @@ import {
     WeakRef as WRShim,
     FinalizationGroup as FGShim,
 } from "@ungap/weakrefs";
-if (!window.WeakRef) {
+
+export const POLYFILLED_WEAKREF = !window.WeakRef;
+
+if (POLYFILLED_WEAKREF) {
     window.WeakRef = WRShim;
     window.FinalizationGroup = FGShim;
-    window.POLYFILLED_WEAKREF = true;
 }
-
-// no exports: side effects

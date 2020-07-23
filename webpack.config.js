@@ -19,6 +19,7 @@ module.exports = {
     context: path.resolve("./packages/record-tuple-playground"),
     entry: {
         index: "./src/index.jsx",
+        "runner/index": "./src/runner/index.js",
         "editor.worker": "monaco-editor/esm/vs/editor/editor.worker.js",
         "ts.worker": "./src/monaco-typescript-rt/ts.worker.js",
     },
@@ -52,7 +53,10 @@ module.exports = {
                     {
                         loader: "file-loader",
                         options: {
-                            name: "[name].[ext]",
+                            context: path.resolve(
+                                "./packages/record-tuple-playground/src",
+                            ),
+                            name: "[path][name].[ext]",
                         },
                     },
                 ],
