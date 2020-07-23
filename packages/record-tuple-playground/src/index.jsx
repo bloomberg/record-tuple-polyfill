@@ -123,12 +123,14 @@ class App extends React.Component {
             syntax: props.syntax || "hash",
             logs: [],
             showOutput: false,
+            domMode: props.domMode,
         };
 
         this.onEditorMounted = this.onEditorMounted.bind(this);
         this.onChange = debounce(this.onChange.bind(this), 500);
         this.onSyntaxChange = this.onSyntaxChange.bind(this);
         this.onToggleShowOutput = this.onToggleShowOutput.bind(this);
+        this.onToggleDomMode = this.onToggleDomMode.bind(this);
         this.update = this.update.bind(this);
 
         this.value = props.content || "";
@@ -176,6 +178,7 @@ class App extends React.Component {
         });
 
         this.iframe = null;
+        this.iframeContainerRef = React.createRef();
     }
 
     render() {
@@ -190,6 +193,8 @@ class App extends React.Component {
                         </select>
                         <button className={this.state.showOutput ? "button-primary" : ""}
                             onClick={this.onToggleShowOutput}>Show Output</button>
+                        <button className={this.state.domMode ? "button-primary" : ""}
+                            onClick={this.onToggleDomMode}>Show DOM Playground</button>
                     </div>
                     <div className="right">
                         <span>Record and Tuple Playground</span>
@@ -211,13 +216,20 @@ class App extends React.Component {
                             options={this.outputOptions}
                             value={this.state.output} />) : null}
                 </div>
-                <div className="console">
-                    {this.state.isError ? 
-                        (<MonacoEditor
-                            options={this.errorOptions}
-                            value={this.state.output} />) :
-                        this.state.logs.map((l, i) =>
-                            <ObjectInspector key={i} theme="chromeDark" data={l.data.length === 1 ? l.data[0] : l.data}/>)}
+                <div className="consoleWrapper">
+                    <div className="console">
+                        {this.state.isError ? 
+                            (<MonacoEditor
+                                options={this.errorOptions}
+                                value={this.state.output} />) :
+                            this.state.logs.map((l, i) =>
+                                <ObjectInspector key={i} theme="chromeDark" data={l.data.length === 1 ? l.data[0] : l.data}/>)}
+                    </div>
+                    <div
+                        className="domPlayground"
+                        style={this.state.domMode ? { flex: 1 } : { height: 0, visibility: "hidden" }}
+                        ref={this.iframeContainerRef}
+                    />
                 </div>
             </div>
         );
@@ -250,6 +262,14 @@ class App extends React.Component {
             showOutput: !this.state.showOutput,
         });
     }
+    
+    onToggleDomMode() {
+        this.setState(state => ({
+            domMode: !state.domMode,
+        }), () => {
+            this.updateHash();
+        });
+    }
 
     update() {
         this.transform(this.value, (err, result) => {
@@ -275,7 +295,8 @@ class App extends React.Component {
     updateHash() {
         const content = this.value;
         const syntax = this.state.syntax;
-        const data = { content, syntax };
+        const domMode = this.state.domMode;
+        const data = { content, syntax, domMode };
         const json = JSON.stringify(data);
         const hash = btoa(json);
         console.log("updating hash with new state " + hash);
@@ -294,7 +315,7 @@ class App extends React.Component {
         this.iframe.onload = () =>
             this.iframe.contentWindow.run(this.state.output, this.fakeConsole);
 
-        document.body.appendChild(this.iframe);
+        this.iframeContainerRef.current?.appendChild(this.iframe);
     }
 }
 
@@ -302,6 +323,7 @@ const hash = window.location.hash;
 console.log("loading from hash " + hash);
 let content = DEFAULT_HASH;
 let syntax = "hash";
+let domMode = false;
 
 try {
     if (hash) {
@@ -310,13 +332,15 @@ try {
 
         content = data.content || content;
         syntax = data.syntax || syntax;
+        domMode = data.domMode || domMode;
         console.log("loading content: " + content);
         console.log("loading syntax: " + syntax);
+        console.log("loading domMode: " + domMode);
     }
 } catch (e) {
     console.error(e);
 }
 render(
-    <App content={content} syntax={syntax} />,
+    <App content={content} syntax={syntax} domMode={domMode} />,
     document.getElementById("root"),
 );
