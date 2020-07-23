@@ -14,8 +14,6 @@
  ** limitations under the License.
  */
 
-import "./weakref-polyfill";
-import * as Polyfill from "@bloomberg/record-tuple-polyfill";
 import * as Monaco from "monaco-editor";
 import { conf, language } from "./patch-language";
 
@@ -62,15 +60,6 @@ function patch() {
         POLYFILL_DTS,
         "file:///node_modules/@types/@bloomberg/record-tuple-polyfill.d.ts",
     );
-
-    // dirty hack to not require bundling of the output of babel
-    // eslint-disable-next-line no-undef
-    window.require = function(path) {
-        if (path !== "@bloomberg/record-tuple-polyfill") {
-            throw new Error("unexpected");
-        }
-        return Polyfill;
-    };
 }
 
 function patchLanguage() {

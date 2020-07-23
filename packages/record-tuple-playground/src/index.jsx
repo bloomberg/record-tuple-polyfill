@@ -17,10 +17,7 @@
 import "./patch";
 import "regenerator-runtime/runtime";
 
-
-import * as Babel from "@babel/core";
-import RecordAndTuple from "@bloomberg/babel-plugin-proposal-record-tuple";
-import PresetEnv from "@babel/preset-env";
+import { compile } from "./babel";
 
 import React from "react";
 import { render } from "react-dom";
@@ -30,6 +27,7 @@ import { ObjectInspector } from "react-inspector";
 import Normalize from "./normalize.css";
 import Skeleton from "./skeleton.css";
 import Html from "./index.html";
+import Runner from "./runner/index.html";
 
 function debounce(func, wait, immediate) {
     let timeout;
@@ -47,10 +45,6 @@ function debounce(func, wait, immediate) {
         if (callNow) func.apply(context, args);
     };
 };
-
-const NO_NATIVE_WEAKREF_ERROR = "WeakMap, WeakRef, and FinalizationRegistry are required for the Record and Tuple playground\n\n" +
-    "We enabled a shim that will leak memory that reproduces those features.\n\n" +
-	"To enable these experimental features natively, go to:\n  https://github.com/bloomberg/record-tuple-polyfill#playground";
 
 const CONSOLE_STYLES = {
     LOG_ICON_WIDTH: "0px",
@@ -180,6 +174,8 @@ class App extends React.Component {
             readOnly: true,
             wordWrap: "on",
         });
+
+        this.iframe = null;
     }
 
     render() {
@@ -287,32 +283,18 @@ class App extends React.Component {
     }
 
     transform(code, callback) {
-        const pluginOptions = {
-            syntaxType: this.state.syntax,
-        };
-
-        const options = {
-            presets: [PresetEnv],
-            plugins: [
-                [RecordAndTuple, pluginOptions]
-            ],
-        };
-        Babel.transform(code, options, function (err, result) {
-            callback(err, result ? result.code : undefined);
-        });
+        compile(code, this.state.syntax, callback);
     }
 
     run() {
-        try {
-            if(globalThis["POLYFILLED_WEAKREF"]) {
-                this.fakeConsole.error(NO_NATIVE_WEAKREF_ERROR);
-            }
-            const func = new Function("console", this.state.output);
-            func(this.fakeConsole);
-        } catch(e) {
-            this.fakeConsole.error(e.message);
-            this.fakeConsole.error(e);
-        }
+        this.iframe?.remove();
+
+        this.iframe = document.createElement("iframe");
+        this.iframe.src = "./runner/index.html";
+        this.iframe.onload = () =>
+            this.iframe.contentWindow.run(this.state.output, this.fakeConsole);
+
+        document.body.appendChild(this.iframe);
     }
 }
 
