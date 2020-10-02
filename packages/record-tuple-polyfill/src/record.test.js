@@ -67,6 +67,8 @@ test("records with the same structural equality will be equal", () => {
     expect(Record({ a: 1 })).toBe(Record({ a: 1 }));
     expect(Record({ a: 1, b: 2 })).toBe(Record({ a: 1, b: 2 }));
     expect(Record({ b: 2, a: 1 })).toBe(Record({ a: 1, b: 2 }));
+    const sym = Symbol("test");
+    expect(Record({ b: sym, a: 1 })).toBe(Record({ a: 1, b: sym }));
     expect(Record({ 0: 0, 1: 1, 2: 2 })).toBe(Record({ 1: 1, 0: 0, 2: 2 }));
     expect(Record({ a: Record({ b: 2 }) })).toBe(
         Record({ a: Record({ b: 2 }) }),
