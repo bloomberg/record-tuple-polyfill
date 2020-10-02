@@ -35,7 +35,7 @@ test("two Boxes wrapping the same value are equal", () => {
     expect(box1).toBe(box2);
 });
 
-test("two Boxes wrapping different values are equal", () => {
+test("two Boxes wrapping different values are not equal", () => {
     const box1 = Box({});
     const box2 = Box({});
     expect(box1).not.toBe(box2);
