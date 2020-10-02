@@ -22,48 +22,54 @@ import { addNamed, isModule } from "@babel/helper-module-imports";
 export default declare((api, options) => {
     api.assertVersion(7);
 
-    if (!options.syntaxType) {
-        options.syntaxType = "hash";
+    const {
+        importPolyfill: shouldImportPolyfill = !!options.polyfillModuleName,
+        polyfillModuleName = "@bloomberg/record-tuple-polyfill",
+    } = options;
+
+    // program -> cacheKey -> localBindingName
+    const importCaches = new WeakMap();
+
+    function getOr(map, key, getDefault) {
+        let value = map.get(key);
+        if (!value) map.set(key, (value = getDefault()));
+        return value;
     }
-    const polyfillModuleName =
-        options.polyfillModuleName || "@bloomberg/record-tuple-polyfill";
+
+    function getBuiltIn(name, path) {
+        if (!shouldImportPolyfill) return t.identifier(name);
+
+        const programPath = path.find(p => p.isProgram());
+        if (!programPath) {
+            throw new Error("Internal error: unable to find the Program node.");
+        }
+
+        const cacheKey = `${name}:${isModule(programPath)}`;
+
+        const cache = getOr(importCaches, programPath.node, () => new Map());
+        const localBindingName = getOr(cache, cacheKey, () => {
+            return addNamed(programPath, name, polyfillModuleName, {
+                importedInterop: "uncompiled",
+            }).name;
+        });
+
+        return t.identifier(localBindingName);
+    }
 
     return {
         name: "@bloomberg/babel-plugin-proposal-record-tuple",
         inherits: syntaxRecordAndTuple,
-        pre(file) {
-            const cache = new Map();
-
-            this.addNamedImport = (source, name) => {
-                const cacheKey = isModule(file.path);
-                const key = `${source}:${name}:${cacheKey || ""}`;
-
-                let cached = cache.get(key);
-                if (cached) {
-                    cached = t.cloneNode(cached);
-                } else {
-                    cached = addNamed(file.path, name, source, {
-                        importedInterop: "uncompiled",
-                    });
-
-                    cache.set(key, cached);
-                }
-                return cached;
-            };
-        },
         visitor: {
             RecordExpression(path) {
-                const record = this.addNamedImport(
-                    polyfillModuleName,
-                    "Record",
-                );
+                const record = getBuiltIn("Record", path);
 
                 const object = t.objectExpression(path.node.properties);
                 const wrapped = t.callExpression(record, [object]);
                 path.replaceWith(wrapped);
             },
             TupleExpression(path) {
-                const tuple = this.addNamedImport(polyfillModuleName, "Tuple");
+                const tuple = getBuiltIn("Tuple", path);
+
                 const wrapped = t.callExpression(tuple, path.node.elements);
                 path.replaceWith(wrapped);
             },

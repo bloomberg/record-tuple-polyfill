@@ -207,7 +207,6 @@ class App extends React.Component {
                     {!this.state.showOutput ?
                         (<MonacoEditor
                             options={this.editorOptions}
-                            value={this.value}
                             editorDidMount={this.onEditorMounted}
                             onChange={this.onChange} />) : null}
                     {this.state.showOutput ?
@@ -238,6 +237,7 @@ class App extends React.Component {
     onEditorMounted(editor, monaco) {
         console.log("editor mounted");
         this.update();
+        editor.setValue(this.value);
     }
 
     onChange(newValue) {
@@ -308,14 +308,17 @@ class App extends React.Component {
     }
 
     run() {
-        this.iframe?.remove();
-
-        this.iframe = document.createElement("iframe");
-        this.iframe.src = "./runner/index.html";
-        this.iframe.onload = () =>
-            this.iframe.contentWindow.run(this.state.output, this.fakeConsole);
-
-        this.iframeContainerRef.current?.appendChild(this.iframe);
+        setTimeout(() => {
+            if (!this.iframe) {
+                this.iframe = document.createElement("iframe");
+                this.iframe.src = "./runner/index.html";
+                this.iframe.onload = () =>
+                    this.iframe.contentWindow.run(this.state.output, this.fakeConsole);
+                this.iframeContainerRef.current?.appendChild(this.iframe);
+            } else {
+                this.iframe.contentWindow.location.reload();
+            }
+        });
     }
 }
 

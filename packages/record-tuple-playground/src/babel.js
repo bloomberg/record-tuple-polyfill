@@ -1,10 +1,11 @@
 import * as Babel from "@babel/core";
 import RecordAndTuple from "@bloomberg/babel-plugin-proposal-record-tuple";
 import PresetEnv from "@babel/preset-env";
+import PresetReact from "@babel/preset-react";
 
 export function compile(code, syntaxType, callback) {
     const options = {
-        presets: [[PresetEnv, { modules: false }]],
+        presets: [[PresetEnv, { modules: false }], [PresetReact]],
         plugins: [[RecordAndTuple, { syntaxType }], replacePolyfillImport],
     };
 

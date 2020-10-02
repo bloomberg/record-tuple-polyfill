@@ -46,7 +46,7 @@ function createRecordFromObject(value) {
     // the argument's OwnPropertyKeys internal slot
     // EnumerableOwnPropertyNames - 7.3.22
     const properties = Object.entries(value)
-        .sort(function(a, b) {
+        .sort(function([a], [b]) {
             if (a < b) return -1;
             else if (a > b) return 1;
             return 0;
