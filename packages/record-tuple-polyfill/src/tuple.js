@@ -14,7 +14,7 @@
  ** limitations under the License.
  */
 
-import { InternGraph, assertFeatures } from "./interngraph";
+import { InternGraph } from "./interngraph";
 import {
     isIterableObject,
     isTuple,
@@ -22,6 +22,7 @@ import {
     validateProperty,
     getTupleLength,
     define,
+    assertFeatures,
 } from "./utils";
 
 function createFreshTupleFromIterableObject(value) {

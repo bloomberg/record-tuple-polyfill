@@ -14,7 +14,7 @@
  ** limitations under the License.
  */
 
-import { Record, Tuple } from "./index";
+import { Box, Record, Tuple } from "./index";
 
 test("Record function throws when presented a non-plain object", () => {
     expect(() => Record(true)).toThrow();
@@ -105,6 +105,10 @@ test("Records work with Object.entries", () => {
         ["b", 2],
     ]);
 });
+test("Records can contain Boxes", () => {
+    expect(() => Record({ a: Box({}) })).not.toThrow();
+});
+
 test("Record.fromEntries", () => {
     expect(
         Record.fromEntries([

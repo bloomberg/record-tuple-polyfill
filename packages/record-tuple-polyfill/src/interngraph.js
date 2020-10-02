@@ -16,19 +16,6 @@
 
 import { ArrayKeyedMap } from "./arraykeyedmap";
 
-const WeakMap = globalThis["WeakMap"];
-const WeakRef = globalThis["WeakRef"];
-const FinalizationRegistry =
-    globalThis["FinalizationRegistry"] || globalThis["FinalizationGroup"];
-
-export function assertFeatures() {
-    if (!WeakMap || !WeakRef || !FinalizationRegistry) {
-        throw new Error(
-            "WeakMap, WeakRef, and FinalizationRegistry are required for @bloomberg/record-tuple-polyfill",
-        );
-    }
-}
-
 const GRAPH_VALUE = Symbol("GRAPH_VALUE");
 const GRAPH_PARENT = Symbol("GRAPH_PARENT");
 const GRAPH_REFCOUNT = Symbol("GRAPH_REFCOUNT");
