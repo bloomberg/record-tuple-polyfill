@@ -10,7 +10,9 @@ script:
   - yarn build
   - yarn test
 
-before_deploy: "npm i -g makeshift && makeshift -s @bloomberg -r registry.npmjs.org"
+before_deploy:
+  - "npm i -g makeshift && makeshift -s @bloomberg -r registry.npmjs.org"
+  - "cd packages/record-tuple-polyfill"
 deploy:
   provider: npm
   email: ossbuild@bloomberg.net
@@ -20,3 +22,5 @@ deploy:
     tags: true
     node: "node"
     condition: -n "$NPM_TOKEN"
+after_deploy:
+  - "cd ../../"
