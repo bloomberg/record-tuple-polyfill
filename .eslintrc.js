@@ -22,6 +22,6 @@ module.exports = {
     globals: {
         "globalThis": "readonly",
         "WeakRef": "readonly",
-        "FinalizationGroup": "readonly"
+        "FinalizationRegistry": "readonly"
     }
 };

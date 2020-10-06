@@ -14,7 +14,7 @@
  ** limitations under the License.
  */
 
-import { InternGraph, assertFeatures } from "./interngraph";
+import { InternGraph } from "./interngraph";
 import {
     isObject,
     objectFromEntries,
@@ -22,6 +22,7 @@ import {
     isRecord,
     markRecord,
     define,
+    assertFeatures,
 } from "./utils";
 
 function createFreshRecordFromProperties(properties) {

@@ -15,14 +15,22 @@
  */
 
 import { stringify, parseImmutable } from "./json";
+import { Box } from "./box";
+import { Record } from "./record";
+import { Tuple } from "./tuple";
 
-const _JSON = {
-    stringify,
-    parseImmutable,
-    parse: JSON.parse,
-    [Symbol.toStringTag]: JSON[Symbol.toStringTag],
-};
+if (!globalThis.Record) {
+    globalThis.Record = Record;
+}
+if (!globalThis.Tuple) {
+    globalThis.Tuple = Tuple;
+}
+if (!globalThis.Box) {
+    globalThis.Box = Box;
+}
 
-export { _JSON as JSON, stringify, parseImmutable };
-export { Record } from "./record";
-export { Tuple } from "./tuple";
+JSON.stringify = stringify;
+JSON.parseImmutable = parseImmutable;
+
+export { stringify, parseImmutable };
+export { Box, Record, Tuple };

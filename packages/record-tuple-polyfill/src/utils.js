@@ -50,11 +50,30 @@ export function getTupleLength(value) {
     return TUPLE_WEAKMAP.get(value);
 }
 
+const BOX_TO_VALUE = new WeakMap();
+const VALUE_TO_BOX = new WeakMap();
+export function isBox(arg) {
+    return BOX_TO_VALUE.has(arg);
+}
+export function unboxBox(box) {
+    if (!isBox(box)) {
+        throw new Error("unboxBox: invalid argument");
+    }
+    return BOX_TO_VALUE.get(box);
+}
+export function findBox(value) {
+    return VALUE_TO_BOX.get(value);
+}
+export function markBox(box, value) {
+    BOX_TO_VALUE.set(box, value);
+    VALUE_TO_BOX.set(value, box);
+}
+
 function isRecordOrTuple(value) {
     return isRecord(value) || isTuple(value);
 }
 export function validateProperty(value) {
-    if (isObject(value) && !isRecordOrTuple(value)) {
+    if (isObject(value) && !isRecordOrTuple(value) && !isBox(value)) {
         throw new Error(
             "TypeError: cannot use an object as a value in a record",
         );
@@ -74,5 +93,17 @@ export function define(obj, props) {
                 ? { get, set, configurable: true }
                 : { value, writable: true, configurable: true };
         Object.defineProperty(obj, key, desc);
+    }
+}
+
+const _WeakMap = globalThis["WeakMap"];
+const _WeakRef = globalThis["WeakRef"];
+const _FinalizationRegistry =
+    globalThis["FinalizationRegistry"] || globalThis["FinalizationGroup"];
+export function assertFeatures() {
+    if (!_WeakMap || !_WeakRef || !_FinalizationRegistry) {
+        throw new Error(
+            "WeakMap, WeakRef, and FinalizationRegistry are required for @bloomberg/record-tuple-polyfill",
+        );
     }
 }
