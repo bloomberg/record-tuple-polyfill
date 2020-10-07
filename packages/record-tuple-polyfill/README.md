@@ -1,4 +1,3 @@
-
 # Record & Tuple Polyfill
 The [Record and Tuple](https://github.com/tc39/proposal-record-tuple) ECMAScript proposal introduces new deeply immutable value types to JavaScript
 that have similar access idioms to objects and arrays.
