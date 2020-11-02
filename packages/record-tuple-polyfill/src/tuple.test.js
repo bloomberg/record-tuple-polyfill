@@ -113,7 +113,7 @@ describe("all and only the specified prototype methods exist", () => {
         popped pushed reversed shifted slice
         sorted spliced concat includes indexOf join
         lastIndexOf entries every filter find findIndex
-        forEach keys map reduce reduceRight some
+        flat flatMap forEach keys map reduce reduceRight some
         unshifted toLocaleString toString values
     `.concat(Symbol.iterator, Symbol.toStringTag);
 
@@ -184,6 +184,22 @@ test("Tuple.prototype.every", () => {
     expect(Tuple(1, 2, 3).every(x => x > 0)).toBe(true);
     expect(() => Tuple.prototype.every.call([1, 2, 3], x => x > 0)).toThrow(
         TypeError,
+    );
+});
+test("Tuple.prototype.flat", () => {
+    expect(Tuple(1, 2, Tuple(3, 4)).flat()).toBe(Tuple(1, 2, 3, 4));
+    expect(Tuple(1, 2, Tuple(3, 4)).flat(0)).toBe(Tuple(1, 2, Tuple(3, 4)));
+    expect(Tuple(1, 2, Tuple(3, Tuple(4))).flat(1)).toBe(
+        Tuple(1, 2, 3, Tuple(4)),
+    );
+});
+test("Tuple.prototype.flatMap", () => {
+    expect(Tuple(1, 2, 3).flatMap(x => x * 2)).toBe(Tuple(2, 4, 6));
+    expect(Tuple(1, 2, 3).flatMap(x => Tuple(x, x * 2))).toBe(
+        Tuple(1, 2, 2, 4, 3, 6),
+    );
+    expect(Tuple(1, 2, 3).flatMap(x => Tuple(Tuple(x, x * 2)))).toBe(
+        Tuple(Tuple(1, 2), Tuple(2, 4), Tuple(3, 6)),
     );
 });
 // TODO: Tuple prototype methods

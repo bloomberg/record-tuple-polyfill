@@ -153,6 +153,32 @@ define(Tuple.prototype, {
 
     findIndex: arrayMethod("findIndex"),
 
+    flat(depth) {
+        assertTuple(this, "flat");
+
+        if (depth === undefined) {
+            depth = 1;
+        } else {
+            depth = Number(depth);
+        }
+
+        if (depth === 0) {
+            return Tuple.prototype.slice.call(this);
+        }
+
+        return this.reduce((acc, cur) => {
+            if (Tuple.isTuple(cur)) {
+                return acc.pushed.apply(acc, this.flat.call(cur, depth - 1));
+            } else {
+                return acc.pushed(cur);
+            }
+        }, Tuple());
+    },
+
+    flatMap(...args) {
+        return Tuple.prototype.map.apply(this, args).flat();
+    },
+
     forEach: arrayMethod("forEach"),
 
     keys: arrayMethod("keys"),
