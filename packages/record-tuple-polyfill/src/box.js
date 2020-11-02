@@ -16,6 +16,7 @@
 
 import {
     isObject,
+    isFunction,
     isRecord,
     isTuple,
     isBox,
@@ -29,7 +30,7 @@ import {
 assertFeatures();
 
 export function Box(value) {
-    if (!isObject(value)) {
+    if (!isObject(value) && !isFunction(value)) {
         throw new TypeError("Box can only wrap objects");
     }
     let box = findBox(value);

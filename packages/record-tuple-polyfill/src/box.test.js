@@ -28,6 +28,12 @@ test("Box creates a Box that wraps an object", () => {
     expect(box.unbox()).toBe(obj);
 });
 
+test("Box creates a Box that wraps a function", () => {
+    function foo() {}
+    const box = Box(foo);
+    expect(box.unbox()).toBe(foo);
+});
+
 test("two Boxes wrapping the same value are equal", () => {
     const obj = {};
     const box1 = Box(obj);
