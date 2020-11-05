@@ -131,7 +131,20 @@ define(Tuple.prototype, {
 
     spliced: arrayMethodUpdatingTuple("splice", "spliced"),
 
-    concat: arrayMethodReturningTuple("concat"),
+    concat(...values) {
+        assertTuple(this, "concat");
+
+        let elements = Array.from(this);
+        do {
+            const value = values.shift();
+            if (Tuple.isTuple(value)) {
+                elements.push(...value);
+            } else {
+                elements.push(value);
+            }
+        } while (values.length > 0);
+        return Tuple.from(elements);
+    },
 
     includes: arrayMethod("includes"),
 
