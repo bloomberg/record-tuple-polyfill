@@ -202,6 +202,11 @@ test("Tuple.prototype.flatMap", () => {
         Tuple(Tuple(1, 2), Tuple(2, 4), Tuple(3, 6)),
     );
 });
+test("Tuple.prototype.concat", () => {
+    expect(Tuple(1, 2, 3).concat(Tuple(4, 5, 6), 7)).toBe(
+        Tuple(1, 2, 3, 4, 5, 6, 7),
+    );
+});
 // TODO: Tuple prototype methods
 
 describe("correct descriptors", () => {
