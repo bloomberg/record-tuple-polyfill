@@ -3,7 +3,7 @@
 The [Record and Tuple](https://github.com/tc39/proposal-record-tuple) ECMAScript proposal introduces new deeply immutable value types to JavaScript
 that have similar access idioms to objects and arrays.
 
-This is an **experiemental and explicitly not production ready** polyfill for the `Record and Tuple` proposal, and a [babel](https://babeljs.io) transform to support using the literal syntax.
+This is an **experimental and explicitly not production ready** polyfill for the `Record and Tuple` proposal, and a [babel](https://babeljs.io) transform to support using the literal syntax.
 
 The polyfill and transform are **constant works in progress** and are not the source of truth for the proposal.
 
