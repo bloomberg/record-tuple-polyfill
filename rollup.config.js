@@ -62,4 +62,22 @@ const TRANSFORM_CONFIG = {
     plugins: [babel()],
 };
 
-export default [POLYFILL_CONFIG, TRANSFORM_CONFIG];
+const BABEL_POLYFILL = "babel-plugin-polyfill-record-tuple";
+const BABEL_POLYFILL_CONFIG = {
+    external: ["@babel/helper-define-polyfill-provider"],
+    input: pkg(BABEL_POLYFILL, "src/index.js"),
+    output: [
+        {
+            file: pkg(BABEL_POLYFILL, "lib/index.esm.js"),
+            format: "es",
+        },
+        {
+            file: pkg(BABEL_POLYFILL, "lib/index.umd.js"),
+            format: "umd",
+            name: "BabelPluginPolyfillRecordAndTuple",
+        },
+    ],
+    plugins: [babel()],
+};
+
+export default [POLYFILL_CONFIG, TRANSFORM_CONFIG, BABEL_POLYFILL_CONFIG];
