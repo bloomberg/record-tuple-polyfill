@@ -64,6 +64,7 @@ console.log(Tuple.from(array));
 # Unsupported Features
 
 `typeof` will return an incorrect value when provided a `Record` or `Tuple`.
+Storing `+/-0` differs from the spec, `Object.is( #[+0][0], #[-0][0] )` returns `true` when it should return `false`.
 This is because the polyfill implements the proposal via [interning](https://en.wikipedia.org/wiki/String_interning) frozen objects.
 
 # Playground
