@@ -1,0 +1,15 @@
+{
+    "name": "@bloomberg/babel-plugin-polyfill-record-tuple",
+    "version": "0.0.1",
+    "main": "lib/index.umd.js",
+    "module": "lib/index.esm.js",
+    "dependencies": {
+        "@babel/helper-define-polyfill-provider": "0.0.6"
+    },
+    "devDependencies": {
+        "@babel/core": "^7.12.10"
+    },
+    "scripts": {
+        "clean": "rm -rf ./lib"
+    }
+}
