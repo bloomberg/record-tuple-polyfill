@@ -15,7 +15,7 @@ export function compile(code, syntaxType, callback) {
 }
 
 const importSource = `data:text/javascript;charset=utf-8,
-export const { Record, Tuple, JSON, stringify, parseImmutable } = globalThis["R&T polyfill"];
+export const { Record, Tuple, Box, JSON, stringify, parseImmutable } = globalThis["R&T polyfill"];
 `;
 
 function replacePolyfillImport({ types: t }) {
