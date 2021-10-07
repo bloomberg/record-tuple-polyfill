@@ -18,10 +18,6 @@ import { Box, Record, Tuple } from "./index";
 
 const hasOwn = Function.call.bind(Object.hasOwnProperty);
 
-test("Box called with zero arguments throws", () => {
-    expect(() => Box()).toThrow();
-});
-
 test("Box creates a Box that wraps an object", () => {
     const obj = {};
     const box = Box(obj);
@@ -45,6 +41,10 @@ test("two Boxes wrapping different values are not equal", () => {
     const box1 = Box({});
     const box2 = Box({});
     expect(box1).not.toBe(box2);
+});
+
+test("Box argument defaults to undefined", () => {
+    expect(Box()).toBe(Box(undefined));
 });
 
 test("Box function creates frozen objects", () => {

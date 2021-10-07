@@ -15,8 +15,6 @@
  */
 
 import {
-    isObject,
-    isFunction,
     isRecord,
     isTuple,
     isBox,
@@ -25,24 +23,28 @@ import {
     markBox,
     define,
     assertFeatures,
+    isPrimitive,
 } from "./utils";
 
 assertFeatures();
 
 export function Box(value) {
-    if (!isObject(value) && !isFunction(value)) {
-        throw new TypeError("Box can only wrap objects");
-    }
     let box = findBox(value);
     if (box) {
         return box;
-    } else {
-        box = Object.create(Box.prototype);
-        Object.freeze(box);
-        markBox(box, value);
-
-        return box;
     }
+
+    if (isPrimitive(value)) {
+        console.warn(
+            "The polyfill leaks memory when creating boxes of primitives.",
+        );
+    }
+
+    box = Object.create(Box.prototype);
+    Object.freeze(box);
+    markBox(box, value);
+
+    return box;
 }
 
 function assertBox(value, methodName) {
@@ -84,7 +86,7 @@ define(Box, {
             return recursiveContainsBox(arg);
         } else {
             throw new TypeError(
-                "Box.containsBoxes called with imcompatible argument",
+                "Box.containsBoxes called with incompatible argument",
             );
         }
     },

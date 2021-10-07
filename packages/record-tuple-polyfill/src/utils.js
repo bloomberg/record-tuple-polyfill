@@ -20,6 +20,9 @@ export function isObject(v) {
 export function isFunction(v) {
     return typeof v === "function";
 }
+export function isPrimitive(v) {
+    return !isObject(v) && !isFunction(v);
+}
 
 export function isIterableObject(v) {
     return isObject(v) && typeof v[Symbol.iterator] === "function";
@@ -51,7 +54,9 @@ export function getTupleLength(value) {
 }
 
 const BOX_TO_VALUE = new WeakMap();
-const VALUE_TO_BOX = new WeakMap();
+const OBJECT_TO_BOX = new WeakMap();
+const PRIMITIVE_TO_BOX = new Map();
+
 export function isBox(arg) {
     return BOX_TO_VALUE.has(arg);
 }
@@ -62,11 +67,11 @@ export function unboxBox(box) {
     return BOX_TO_VALUE.get(box);
 }
 export function findBox(value) {
-    return VALUE_TO_BOX.get(value);
+    return (isPrimitive(value) ? PRIMITIVE_TO_BOX : OBJECT_TO_BOX).get(value);
 }
 export function markBox(box, value) {
     BOX_TO_VALUE.set(box, value);
-    VALUE_TO_BOX.set(value, box);
+    (isPrimitive(value) ? PRIMITIVE_TO_BOX : OBJECT_TO_BOX).set(value, box);
 }
 
 function isRecordOrTuple(value) {
