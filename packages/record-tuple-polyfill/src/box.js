@@ -88,6 +88,10 @@ define(Box, {
             );
         }
     },
+    unbox(box) {
+        assertBox(box, "unbox");
+        return unboxBox(box);
+    },
 });
 
 define(Box.prototype, {
@@ -95,9 +99,5 @@ define(Box.prototype, {
     valueOf() {
         assertBox(this, "valueOf");
         return this;
-    },
-    unbox() {
-        assertBox(this, "unbox");
-        return unboxBox(this);
     },
 });
