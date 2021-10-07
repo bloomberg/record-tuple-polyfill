@@ -51,6 +51,10 @@ test("Box function creates frozen objects", () => {
     expect(Object.isFrozen(Box({}))).toBe(true);
 });
 
+test("Box toString", () => {
+    expect(String(Box({}))).toBe("[object Box]");
+});
+
 test("Box has no own properties", () => {
     expect(Reflect.ownKeys(Box({})).length).toBe(0);
 });
