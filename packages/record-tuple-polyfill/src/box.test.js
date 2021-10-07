@@ -25,13 +25,13 @@ test("Box called with zero arguments throws", () => {
 test("Box creates a Box that wraps an object", () => {
     const obj = {};
     const box = Box(obj);
-    expect(box.unbox()).toBe(obj);
+    expect(Box.unbox(box)).toBe(obj);
 });
 
 test("Box creates a Box that wraps a function", () => {
     function foo() {}
     const box = Box(foo);
-    expect(box.unbox()).toBe(foo);
+    expect(Box.unbox(box)).toBe(foo);
 });
 
 test("two Boxes wrapping the same value are equal", () => {
@@ -84,7 +84,7 @@ describe("Box.containsBoxes", () => {
 });
 
 describe("all and only the specified prototype methods exist", () => {
-    const names = ["constructor", "valueOf", "unbox", Symbol.toStringTag];
+    const names = ["constructor", "valueOf", Symbol.toStringTag];
     test.each(names)(".%s", name => {
         // We can't use expect().toHaveProperty because its doesn't support symbols
         expect(hasOwn(Box.prototype, name)).toBe(true);
@@ -98,7 +98,7 @@ describe("all and only the specified prototype methods exist", () => {
 describe("correct descriptors", () => {
     const desc = Object.getOwnPropertyDescriptor;
 
-    test.each(["containsBoxes"])("Tuple.%s", name => {
+    test.each(["containsBoxes", "unbox"])("Tuple.%s", name => {
         expect(desc(Box, name)).toEqual({
             writable: true,
             enumerable: false,
