@@ -16,7 +16,7 @@
 
 import { Record } from "./record";
 import { createTupleFromIterableObject } from "./tuple";
-import { isRecord, isTuple, validateProperty } from "./utils";
+import { isBox, isRecord, isTuple, validateProperty } from "./utils";
 
 const JSON$stringify = JSON.stringify;
 const JSON$parse = JSON.parse;
@@ -52,7 +52,11 @@ export function stringify(value, replacer, space) {
             }
 
             if (isRecord(val)) return { ...val };
-            else if (isTuple(val)) return Array.from(val);
+            if (isTuple(val)) return Array.from(val);
+            if (isBox(val)) {
+                throw new TypeError("Box value can't be serialized in JSON");
+            }
+
             return val;
         },
         space,
