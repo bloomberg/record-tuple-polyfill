@@ -14,7 +14,7 @@
  ** limitations under the License.
  */
 
-import { Record, Tuple, stringify, parseImmutable } from "./";
+import { Record, Tuple, Box, stringify, parseImmutable } from "./";
 
 describe("stringify", () => {
     test("supports records and tuples", () => {
@@ -105,6 +105,24 @@ describe("stringify", () => {
         expect(stringify(obj, ["foo", 0, 1, 2])).toMatchInlineSnapshot(
             `"{\\"foo\\":[1,2,3]}"`,
         );
+    });
+
+    test("throws when serializing boxes", () => {
+        const value = {
+            x: Box({ y: 1 }),
+        };
+
+        expect(() => stringify(value)).toThrow(TypeError);
+
+        expect(
+            stringify(value, (k, v) => (v instanceof Box ? Box.unbox(v) : v)),
+        ).toBe('{"x":{"y":1}}');
+
+        expect(
+            stringify(value, (k, v) =>
+                v instanceof Box ? { $$box: Box.unbox(v) } : v,
+            ),
+        ).toBe('{"x":{"$$box":{"y":1}}}');
     });
 });
 
