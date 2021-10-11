@@ -30,10 +30,16 @@ test("Box creates a Box that wraps a function", () => {
     expect(Box.unbox(box)).toBe(foo);
 });
 
-test("two Boxes wrapping the same value are equal", () => {
+test("two Boxes wrapping the same object are equal", () => {
     const obj = {};
     const box1 = Box(obj);
     const box2 = Box(obj);
+    expect(box1).toBe(box2);
+});
+
+test("two Boxes wrapping the same primitive are equal", () => {
+    const box1 = Box("abc");
+    const box2 = Box("abc");
     expect(box1).toBe(box2);
 });
 

@@ -18,7 +18,6 @@ import {
     isRecord,
     isTuple,
     isBox,
-    findBox,
     unboxBox,
     markBox,
     define,
@@ -28,22 +27,42 @@ import {
 
 assertFeatures();
 
+const OBJECT_BOXES = new WeakMap();
+const PRIMITIVE_BOXES = new Map();
+
 export function Box(value) {
-    let box = findBox(value);
-    if (box) {
-        return box;
-    }
+    return isPrimitive(value) ? getPrimitiveBox(value) : getObjectBox(value);
+}
 
-    if (isPrimitive(value)) {
-        console.warn(
-            "The polyfill leaks memory when creating boxes of primitives.",
-        );
-    }
-
-    box = Object.create(Box.prototype);
+function createBox(value) {
+    const box = Object.create(Box.prototype);
     Object.freeze(box);
     markBox(box, value);
+    return box;
+}
 
+function getPrimitiveBox(value) {
+    let ref = PRIMITIVE_BOXES.get(value);
+    if (ref && ref.deref()) {
+        return ref.deref();
+    }
+
+    const box = createBox(value);
+    ref = new WeakRef(box);
+    PRIMITIVE_BOXES.set(value, ref);
+
+    const group = new FinalizationRegistry(map => map.delete(value));
+    group.register(box, PRIMITIVE_BOXES);
+
+    return box;
+}
+
+function getObjectBox(value) {
+    let box = OBJECT_BOXES.get(value);
+    if (box) return box;
+
+    box = createBox(value);
+    OBJECT_BOXES.set(value, box);
     return box;
 }
 
