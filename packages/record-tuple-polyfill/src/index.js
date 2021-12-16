@@ -15,7 +15,6 @@
  */
 
 import { stringify, parseImmutable } from "./json";
-import { Box } from "./box";
 import { Record } from "./record";
 import { Tuple } from "./tuple";
 
@@ -25,12 +24,9 @@ if (!globalThis.Record) {
 if (!globalThis.Tuple) {
     globalThis.Tuple = Tuple;
 }
-if (!globalThis.Box) {
-    globalThis.Box = Box;
-}
 
 JSON.stringify = stringify;
 JSON.parseImmutable = parseImmutable;
 
 export { stringify, parseImmutable };
-export { Box, Record, Tuple };
+export { Record, Tuple };
