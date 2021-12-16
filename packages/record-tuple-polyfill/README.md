@@ -21,7 +21,7 @@ To install the transform and polyfill:
 
 ```
 # install the babel transform as a dev dependency, only needed at compile time
-npm install -D @bloomberg/babel-plugin-proposal-record-tuple
+npm install -D @babel/plugin-proposal-record-and-tuple
 
 # install the polyfill as a regular dependency, needed at runtime
 npm install --save @bloomberg/record-tuple-polyfill
@@ -31,7 +31,7 @@ Next, add the plugin to your `babel` configuration. Example:
 
 ```json
 {
-    "plugins": [["@bloomberg/babel-plugin-proposal-record-tuple", { "syntaxType": "hash" }]]
+    "plugins": [["@babel/plugin-proposal-record-tuple", { "syntaxType": "hash" }]]
 }
 ```
 

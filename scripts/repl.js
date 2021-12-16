@@ -48,10 +48,7 @@ const replPlugin = ({ types: t }) => ({
 const babelConfig = {
     presets: ["@babel/preset-env"],
     plugins: [
-        [
-            "@bloomberg/babel-plugin-proposal-record-tuple",
-            { syntaxType: "hash" },
-        ],
+        ["@babel/plugin-proposal-record-and-tuple", { syntaxType: "hash" }],
         replPlugin,
     ],
     ignore: ["./node_modules"],

@@ -1,7 +1,0 @@
-{
-  "plugins": [["../../../../", {
-    "syntaxType": "hash",
-    "importPolyfill": true,
-    "polyfillModuleName": "my-polyfill"
-  }]]
-}

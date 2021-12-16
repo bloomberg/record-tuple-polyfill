@@ -1,5 +1,5 @@
 import * as Babel from "@babel/core";
-import RecordAndTuple from "@bloomberg/babel-plugin-proposal-record-tuple";
+import RecordAndTuple from "@babel/plugin-proposal-record-and-tuple";
 import PresetEnv from "@babel/preset-env";
 import PresetReact from "@babel/preset-react";
 
