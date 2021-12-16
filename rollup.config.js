@@ -39,27 +39,4 @@ const POLYFILL_CONFIG = {
     plugins: [babel()],
 };
 
-const TRANSFORM = "babel-plugin-proposal-record-tuple";
-const TRANSFORM_CONFIG = {
-    external: [
-        "@babel/helper-plugin-utils",
-        "@babel/plugin-syntax-record-tuple",
-        "@babel/core",
-        "@babel/helper-module-imports",
-    ],
-    input: pkg(TRANSFORM, "src/index.js"),
-    output: [
-        {
-            file: pkg(TRANSFORM, "lib/index.esm.js"),
-            format: "es",
-        },
-        {
-            file: pkg(TRANSFORM, "lib/index.umd.js"),
-            format: "umd",
-            name: "BabelPluginProposalRecordAndTuple",
-        },
-    ],
-    plugins: [babel()],
-};
-
-export default [POLYFILL_CONFIG, TRANSFORM_CONFIG];
+export default [POLYFILL_CONFIG];
