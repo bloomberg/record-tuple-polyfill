@@ -17,6 +17,7 @@
 import { InternGraph } from "./interngraph";
 
 describe("InternGraph", () => {
+    // eslint-disable-next-line jest/no-disabled-tests
     test.skip(".get() returns the same object twice for the same input", () => {
         function creator(values) {
             return [].concat.apply([], values);
