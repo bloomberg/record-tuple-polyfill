@@ -17,6 +17,9 @@
 import { stringify, parseImmutable } from "./json";
 import { Record } from "./record";
 import { Tuple } from "./tuple";
+import { WeakMap$prototype$set } from "./weakcollections";
+import { WeakSet$prototype$add } from "./weakcollections";
 
 export { stringify as JSON$stringify, parseImmutable as JSON$parseImmutable };
 export { Record, Tuple };
+export { WeakMap$prototype$set, WeakSet$prototype$add };
