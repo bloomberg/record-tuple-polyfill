@@ -22,21 +22,38 @@ function pkg(name, path) {
     return `packages/${name}`;
 }
 
-const POLYFILL_CONFIG = {
-    external: [],
-    input: pkg("record-tuple-polyfill", "src/index.js"),
-    output: [
-        {
-            file: pkg("record-tuple-polyfill", "lib/index.esm.js"),
-            format: "es",
-        },
-        {
-            file: pkg("record-tuple-polyfill", "lib/index.umd.js"),
-            format: "umd",
-            name: "RecordAndTuple",
-        },
-    ],
-    plugins: [babel()],
-};
+const PKG_NAME = "record-tuple-polyfill";
+const POLYFILL_CONFIG = [
+    {
+        input: pkg(PKG_NAME, "src/index.js"),
+        output: [
+            {
+                file: pkg(PKG_NAME, "lib/index.esm.js"),
+                format: "es",
+            },
+            {
+                file: pkg(PKG_NAME, "lib/index.umd.js"),
+                format: "umd",
+                name: "RecordAndTuple",
+            },
+        ],
+        plugins: [babel()],
+    },
+    {
+        input: pkg(PKG_NAME, "src/modify-global.js"),
+        output: [
+            {
+                file: pkg(PKG_NAME, "lib/modify-global.esm.js"),
+                format: "es",
+            },
+            {
+                file: pkg(PKG_NAME, "lib/modify-global.umd.js"),
+                format: "umd",
+                name: "RecordAndTuple",
+            },
+        ],
+        plugins: [babel()],
+    },
+];
 
-export default [POLYFILL_CONFIG];
+export default POLYFILL_CONFIG;
