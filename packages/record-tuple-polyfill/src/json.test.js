@@ -14,16 +14,16 @@
  ** limitations under the License.
  */
 
-import { Record, Tuple, stringify, parseImmutable } from "./";
+import { Record, Tuple, JSON$stringify, JSON$parseImmutable } from "./";
 
-describe("stringify", () => {
+describe("JSON$stringify", () => {
     test("supports records and tuples", () => {
         const value = Record({
             foo: 2,
             bar: Tuple("a", Record({}), Tuple()),
         });
 
-        expect(stringify(value)).toBe(`{"bar":["a",{},[]],"foo":2}`);
+        expect(JSON$stringify(value)).toBe(`{"bar":["a",{},[]],"foo":2}`);
     });
 
     test("supports the 'space' parameter", () => {
@@ -32,7 +32,7 @@ describe("stringify", () => {
             bar: Tuple("a", Record({}), Tuple()),
         });
 
-        expect(stringify(value, null, 2)).toMatchInlineSnapshot(`
+        expect(JSON$stringify(value, null, 2)).toMatchInlineSnapshot(`
                     "{
                       \\"bar\\": [
                         \\"a\\",
@@ -43,7 +43,7 @@ describe("stringify", () => {
                     }"
             `);
 
-        expect(stringify(value, null, "hello")).toMatchInlineSnapshot(`
+        expect(JSON$stringify(value, null, "hello")).toMatchInlineSnapshot(`
                     "{
                     hello\\"bar\\": [
                     hellohello\\"a\\",
@@ -69,9 +69,9 @@ describe("stringify", () => {
             ),
         });
 
-        expect(stringify(value, ["bar", Object("baz"), 0, Object(1)])).toBe(
-            '{"bar":["a",{"bar":{"bar":1,"baz":5},"baz":4},null]}',
-        );
+        expect(
+            JSON$stringify(value, ["bar", Object("baz"), 0, Object(1)]),
+        ).toBe('{"bar":["a",{"bar":{"bar":1,"baz":5},"baz":4},null]}');
     });
 
     test("the replacer function receives records and tuples as args", () => {
@@ -102,18 +102,18 @@ describe("stringify", () => {
         };
         obj.bar = obj;
 
-        expect(stringify(obj, ["foo", 0, 1, 2])).toMatchInlineSnapshot(
+        expect(JSON$stringify(obj, ["foo", 0, 1, 2])).toMatchInlineSnapshot(
             `"{\\"foo\\":[1,2,3]}"`,
         );
     });
 });
 
-describe("parseImmutable", () => {
+describe("JSON$parseImmutable", () => {
     describe("it works with any JSON value", () => {
         const cases = ["1", "0.3", "true", "false", "null", '"aaa"'];
 
         test.each(cases)("primitive %s", text => {
-            expect(parseImmutable(text)).toBe(JSON.parse(text));
+            expect(JSON$parseImmutable(text)).toBe(JSON.parse(text));
         });
 
         test("JSON objects and arrays", () => {
@@ -131,7 +131,7 @@ describe("parseImmutable", () => {
                 }),
             });
 
-            expect(parseImmutable(text)).toBe(expected);
+            expect(JSON$parseImmutable(text)).toBe(expected);
         });
     });
 
@@ -153,7 +153,7 @@ describe("parseImmutable", () => {
 
             const calls = [];
 
-            parseImmutable(text, (key, value) => {
+            JSON$parseImmutable(text, (key, value) => {
                 calls.push({ key, value });
                 return value;
             });
@@ -193,7 +193,7 @@ describe("parseImmutable", () => {
                 asd: Tuple(Record({ x: 2 })),
             });
 
-            expect(parseImmutable(test, reviver)).toBe(expected);
+            expect(JSON$parseImmutable(test, reviver)).toBe(expected);
         });
 
         test("can return undefined to remove properties", () => {
@@ -218,12 +218,12 @@ describe("parseImmutable", () => {
                 asd: Tuple(1, undefined, 3),
             });
 
-            expect(parseImmutable(test, reviver)).toBe(expected);
+            expect(JSON$parseImmutable(test, reviver)).toBe(expected);
         });
 
         test("cannot return mutable values", () => {
             const returning = val => {
-                return () => parseImmutable("{}", () => val);
+                return () => JSON$parseImmutable("{}", () => val);
             };
 
             expect(returning({})).toThrow(Error); // TODO: TypeError
@@ -244,7 +244,7 @@ describe("parseImmutable", () => {
 
             const receivers = [];
 
-            parseImmutable(text, function(key, value) {
+            JSON$parseImmutable(text, function(key, value) {
                 receivers.push(this);
                 return value;
             });
