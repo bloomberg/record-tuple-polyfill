@@ -6,12 +6,12 @@
   "main": "lib/index.umd.js",
   "exports": {
       ".": {
-          "require": "lib/index.umd.js",
-          "default": "lib/index.esm.js"
+          "require": "./lib/index.umd.js",
+          "default": "./lib/index.esm.js"
       },
       "./modify-global": {
-          "require": "lib/modify-global.umd.js",
-          "default": "lib/modify-global.esm.js"
+          "require": "./lib/modify-global.umd.js",
+          "default": "./lib/modify-global.esm.js"
       }
   },
   "files": [ "lib/*.js" ],
