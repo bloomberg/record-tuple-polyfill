@@ -14,6 +14,7 @@
  ** limitations under the License.
  */
 const path = require("path");
+const webpack = require("webpack");
 
 module.exports = {
     context: path.resolve("./packages/record-tuple-playground"),
@@ -25,7 +26,6 @@ module.exports = {
     },
     output: {
         path: path.resolve("./packages/record-tuple-playground/dist"),
-        filename: "[name].js",
     },
     module: {
         rules: [
@@ -63,7 +63,18 @@ module.exports = {
             },
         ],
     },
-    node: {
-        fs: "empty",
+    resolve: {
+        fallback: {
+            fs: false,
+            path: require.resolve("path/"),
+            assert: false,
+            util: require.resolve("util/"),
+        },
     },
+    plugins: [
+        new webpack.ProvidePlugin({
+            process: "process",
+            Buffer: "buffer",
+        }),
+    ],
 };

@@ -1,9 +1,7 @@
 /* globals btoa */
 
 import { POLYFILLED_WEAKREF } from "./weakref-polyfill.js";
-import * as Polyfill from "@bloomberg/record-tuple-polyfill";
-
-globalThis["R&T polyfill"] = Polyfill;
+import "@bloomberg/record-tuple-polyfill/modify-global";
 
 const NO_NATIVE_WEAKREF_ERROR =
     "WeakMap, WeakRef, and FinalizationRegistry are required for the Record and Tuple playground\n\n" +

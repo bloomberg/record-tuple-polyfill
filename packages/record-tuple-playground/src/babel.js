@@ -6,7 +6,10 @@ import PresetReact from "@babel/preset-react";
 export function compile(code, syntaxType, callback) {
     const options = {
         presets: [[PresetEnv, { modules: false }], [PresetReact]],
-        plugins: [[RecordAndTuple, { syntaxType }], replacePolyfillImport],
+        plugins: [
+            [RecordAndTuple, { syntaxType, importPolyfill: false }],
+            replacePolyfillImport,
+        ],
     };
 
     return Babel.transform(code, options, function(err, result) {
@@ -15,7 +18,8 @@ export function compile(code, syntaxType, callback) {
 }
 
 const importSource = `data:text/javascript;charset=utf-8,
-export const { Record, Tuple, JSON, stringify, parseImmutable } = globalThis["R&T polyfill"];
+export const Record = globalThis.Record;
+export const Tuple = globalThis.Tuple;
 `;
 
 function replacePolyfillImport({ types: t }) {
