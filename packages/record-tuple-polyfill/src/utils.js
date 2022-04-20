@@ -14,6 +14,11 @@
  ** limitations under the License.
  */
 
+import {
+    originalWeakMapSet,
+    originalWeakSetAdd,
+} from "./weakcollections-original";
+
 export function isObject(v) {
     return typeof v === "object" && v !== null;
 }
@@ -41,10 +46,10 @@ export function isTuple(value) {
     return TUPLE_WEAKMAP.has(value);
 }
 export function markRecord(value) {
-    RECORD_WEAKSET.add(value);
+    originalWeakSetAdd.call(RECORD_WEAKSET, value);
 }
 export function markTuple(value, length) {
-    TUPLE_WEAKMAP.set(value, length);
+    originalWeakMapSet.call(TUPLE_WEAKMAP, value, length);
 }
 export function getTupleLength(value) {
     return TUPLE_WEAKMAP.get(value);
