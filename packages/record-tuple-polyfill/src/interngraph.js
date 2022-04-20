@@ -15,6 +15,7 @@
  */
 
 import { ArrayKeyedMap } from "./arraykeyedmap";
+import { originalWeakMapSet } from "./weakcollections-original";
 
 const GRAPH_VALUE = Symbol("GRAPH_VALUE");
 const GRAPH_PARENT = Symbol("GRAPH_PARENT");
@@ -79,7 +80,7 @@ export class InternGraph {
             }.bind(this),
         );
         group.register(value, map);
-        this._finalizers.set(value, group);
+        originalWeakMapSet.call(this._finalizers, value, group);
 
         return value;
     }
