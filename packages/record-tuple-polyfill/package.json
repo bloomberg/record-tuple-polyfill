@@ -1,6 +1,6 @@
 {
   "name": "@bloomberg/record-tuple-polyfill",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "A polyfill for the Record and Tuple Stage 2 ECMAScript proposal.",
   "type": "commonjs",
   "main": "lib/index.umd.js",
