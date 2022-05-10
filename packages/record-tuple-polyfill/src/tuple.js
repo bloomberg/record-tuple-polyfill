@@ -117,20 +117,6 @@ define(Tuple.prototype, {
         return this;
     },
 
-    popped: arrayMethodUpdatingTuple("pop", "popped"),
-
-    pushed: arrayMethodUpdatingTuple("push", "pushed"),
-
-    reversed: arrayMethodUpdatingTuple("reverse", "reversed"),
-
-    shifted: arrayMethodUpdatingTuple("shift", "shifted"),
-
-    unshifted: arrayMethodUpdatingTuple("unshift", "unshifted"),
-
-    sorted: arrayMethodUpdatingTuple("sort", "sorted"),
-
-    spliced: arrayMethodUpdatingTuple("splice", "spliced"),
-
     concat(...values) {
         assertTuple(this, "concat");
 
@@ -181,9 +167,9 @@ define(Tuple.prototype, {
 
         return this.reduce((acc, cur) => {
             if (Tuple.isTuple(cur)) {
-                return acc.pushed.apply(acc, this.flat.call(cur, depth - 1));
+                return acc.concat(this.flat.call(cur, depth - 1));
             } else {
-                return acc.pushed(cur);
+                return acc.concat(Tuple(cur));
             }
         }, Tuple());
     },
@@ -209,6 +195,12 @@ define(Tuple.prototype, {
     toString: arrayMethod("toString"),
 
     toLocaleString: arrayMethod("toLocaleString"),
+
+    toReversed: arrayMethodUpdatingTuple("reverse", "toReversed"),
+
+    toSorted: arrayMethodUpdatingTuple("sort", "toSorted"),
+
+    toSpliced: arrayMethodUpdatingTuple("splice", "toSpliced"),
 
     with(index, value) {
         assertTuple(this, "with");

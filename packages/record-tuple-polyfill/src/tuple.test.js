@@ -109,12 +109,11 @@ describe("all and only the specified prototype methods exist", () => {
     const list = ([str]) => str.trim().split(/\s+/g);
 
     const names = list`
-        constructor valueOf length with
-        popped pushed reversed shifted slice
-        sorted spliced concat includes indexOf join
+        constructor valueOf length with slice toReversed
+        toSorted toSpliced concat includes indexOf join
         lastIndexOf entries every filter find findIndex
         flat flatMap forEach keys map reduce reduceRight some
-        unshifted toLocaleString toString values
+        toLocaleString toString values
     `.concat(Symbol.iterator, Symbol.toStringTag);
 
     test.each(names)(".%s", name => {
@@ -162,18 +161,6 @@ test("Tuple.prototype.toString", () => {
     expect(() => Tuple.prototype.toString.call([])).toThrow(TypeError);
 });
 
-test("Tuple.prototype.popped", () => {
-    expect(Tuple().popped()).toBe(Tuple());
-    expect(Tuple(1).popped()).toBe(Tuple());
-    expect(Tuple(1, 2, 3).popped()).toBe(Tuple(1, 2));
-    expect(() => Tuple.prototype.popped.call([1, 2, 3])).toThrow(TypeError);
-});
-test("Tuple.prototype.pushed", () => {
-    expect(Tuple().pushed()).toBe(Tuple());
-    expect(Tuple().pushed(undefined)).toBe(Tuple(undefined));
-    expect(Tuple().pushed(1, 2, 3)).toBe(Tuple(1, 2, 3));
-    expect(Tuple(1, 2, 3).pushed(4, 5, 6)).toBe(Tuple(1, 2, 3, 4, 5, 6));
-});
 test("Tuple.prototype.map", () => {
     expect(Tuple(1, 2, 3).map(x => 2 * x)).toBe(Tuple(2, 4, 6));
     expect(() => Tuple.prototype.map.call([1, 2, 3], x => 2 * x)).toThrow(
@@ -206,6 +193,15 @@ test("Tuple.prototype.concat", () => {
     expect(Tuple(1, 2, 3).concat(Tuple(4, 5, 6), 7)).toBe(
         Tuple(1, 2, 3, 4, 5, 6, 7),
     );
+});
+test("Tuple.prototype.toSorted", () => {
+    expect(Tuple(1, 3, 2).toSorted()).toBe(Tuple(1, 2, 3));
+});
+test("Tuple.prototype.toReversed", () => {
+    expect(Tuple(3, 2, 1).toReversed()).toBe(Tuple(1, 2, 3));
+});
+test("Tuple.prototype.toSpliced", () => {
+    expect(Tuple(1, 1, 1, 4).toSpliced(1, 2, 2, 3)).toBe(Tuple(1, 2, 3, 4));
 });
 // TODO: Tuple prototype methods
 
