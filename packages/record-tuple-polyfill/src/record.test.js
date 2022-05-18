@@ -125,6 +125,10 @@ test("Record.fromEntries", () => {
             ["a", 1],
         ]),
     ).toThrow();
+
+    let sym = Symbol();
+    expect(() => Record.fromEntries([[sym, 1]])).toThrow();
+    expect(Record.fromEntries([["foo", sym]])).toBe(Record({ foo: sym }));
 });
 test("Records work with Object.values", () => {
     expect(Object.values(Record({ a: 1, b: 2 }))).toEqual([1, 2]);

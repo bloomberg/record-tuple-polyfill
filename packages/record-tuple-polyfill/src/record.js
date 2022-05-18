@@ -17,7 +17,7 @@
 import { InternGraph } from "./interngraph";
 import {
     isObject,
-    objectFromEntries,
+    fakeRecordFromEntries,
     validateProperty,
     isRecord,
     markRecord,
@@ -72,7 +72,7 @@ if (Record.name !== "Record") {
 define(Record, {
     isRecord,
     fromEntries(iterator) {
-        return createRecordFromObject(objectFromEntries(iterator));
+        return createRecordFromObject(fakeRecordFromEntries(iterator));
     },
 });
 
