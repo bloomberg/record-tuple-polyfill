@@ -30,8 +30,13 @@ export function isIterableObject(v) {
     return isObject(v) && typeof v[Symbol.iterator] === "function";
 }
 
-export function objectFromEntries(iterable) {
+export function fakeRecordFromEntries(iterable) {
     return [...iterable].reduce((obj, [key, val]) => {
+        if (typeof key === "symbol") {
+            throw new TypeError(
+                "A Symbol cannot be used as a property key in a Record.",
+            );
+        }
         obj[key] = val;
         return obj;
     }, {});
