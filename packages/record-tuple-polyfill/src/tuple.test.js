@@ -109,7 +109,7 @@ describe("all and only the specified prototype methods exist", () => {
     const list = ([str]) => str.trim().split(/\s+/g);
 
     const names = list`
-        constructor valueOf at with slice toReversed
+        constructor valueOf with slice toReversed
         toSorted toSpliced concat includes indexOf join
         lastIndexOf entries every filter find findIndex
         flat flatMap forEach keys map reduce reduceRight some
