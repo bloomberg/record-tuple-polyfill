@@ -20,7 +20,6 @@ import {
     isTuple,
     markTuple,
     validateProperty,
-    getTupleLength,
     define,
     assertFeatures,
 } from "./utils";
@@ -41,8 +40,12 @@ function createFreshTupleFromIterableObject(value) {
         length++;
     }
 
+    Object.defineProperty(tuple, "length", {
+        value: length,
+    });
+
     Object.freeze(tuple);
-    markTuple(tuple, length);
+    markTuple(tuple);
     return tuple;
 }
 
@@ -106,11 +109,6 @@ Object.defineProperty(Tuple.prototype, Symbol.toStringTag, {
 
 define(Tuple.prototype, {
     constructor: Tuple,
-
-    get length() {
-        assertTuple(this, "length");
-        return getTupleLength(this);
-    },
 
     valueOf() {
         assertTuple(this, "valueOf");
