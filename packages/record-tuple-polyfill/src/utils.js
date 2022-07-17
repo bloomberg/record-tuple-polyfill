@@ -92,3 +92,22 @@ export function assertFeatures() {
         );
     }
 }
+
+/** https://tc39.es/ecma262/#sec-tointegerorinfinity */
+export function toIntegerOrInfinity(arg) {
+    const n = Number(arg);
+    if (Number.isNaN(n) || n === 0) {
+        return 0;
+    }
+    if (n === Number.POSITIVE_INFINITY) {
+        return Number.POSITIVE_INFINITY;
+    }
+    if (n === Number.NEGATIVE_INFINITY) {
+        return Number.NEGATIVE_INFINITY;
+    }
+    let i = Math.floor(Math.abs(n));
+    if (n < 0) {
+        i = -i;
+    }
+    return i;
+}

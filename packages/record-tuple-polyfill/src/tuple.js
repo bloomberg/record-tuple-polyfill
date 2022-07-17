@@ -22,6 +22,7 @@ import {
     validateProperty,
     define,
     assertFeatures,
+    toIntegerOrInfinity,
 } from "./utils";
 
 function createFreshTupleFromIterableObject(value) {
@@ -202,12 +203,15 @@ define(Tuple.prototype, {
 
     with(index, value) {
         assertTuple(this, "with");
-
-        if (typeof index !== "number")
-            throw new TypeError(`index provided to .with() must be a number`);
-
+        const length = this.length;
+        const relativeIndex = toIntegerOrInfinity(index);
+        const actualIndex =
+            relativeIndex >= 0 ? relativeIndex : length + relativeIndex;
+        if (actualIndex >= length || actualIndex < 0) {
+            throw new RangeError(".with index is out of bounds");
+        }
         const array = Array.from(this);
-        array[index] = value;
+        array[actualIndex] = value;
         return createTupleFromIterableObject(array);
     },
 });

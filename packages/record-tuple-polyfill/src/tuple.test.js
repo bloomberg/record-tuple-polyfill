@@ -196,6 +196,13 @@ test("Tuple.prototype.toReversed", () => {
 test("Tuple.prototype.toSpliced", () => {
     expect(Tuple(1, 1, 1, 4).toSpliced(1, 2, 2, 3)).toBe(Tuple(1, 2, 3, 4));
 });
+test("Tuple.prototype.with", () => {
+    expect(() => Tuple().with()).toThrow(RangeError);
+    expect(() => Tuple(1).with(1)).toThrow(RangeError);
+    expect(() => Tuple(1).with(-2)).toThrow(RangeError);
+    expect(Tuple(1, 2, 42).with(2, 3)).toBe(Tuple(1, 2, 3));
+    expect(Tuple(1, 2, 42).with(-1, 3)).toBe(Tuple(1, 2, 3));
+});
 // TODO: Tuple prototype methods
 
 describe("correct descriptors", () => {
