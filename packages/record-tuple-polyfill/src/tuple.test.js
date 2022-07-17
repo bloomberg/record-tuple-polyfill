@@ -109,7 +109,7 @@ describe("all and only the specified prototype methods exist", () => {
     const list = ([str]) => str.trim().split(/\s+/g);
 
     const names = list`
-        constructor valueOf length with slice toReversed
+        constructor valueOf with slice toReversed
         toSorted toSpliced concat includes indexOf join
         lastIndexOf entries every filter find findIndex
         flat flatMap forEach keys map reduce reduceRight some
@@ -126,29 +126,22 @@ describe("all and only the specified prototype methods exist", () => {
     });
 });
 
-describe("Tuple.prototype.length", () => {
+describe("Tuple length", () => {
     test("basic behavior", () => {
         expect(Tuple().length).toBe(0);
         expect(Tuple(1, 2, 3).length).toBe(3);
     });
 
-    test("not an own property", () => {
-        expect(hasOwn(Tuple(), "length")).toBe(false);
+    test("is an own property", () => {
+        expect(hasOwn(Tuple(), "length")).toBe(true);
     });
 
-    test("this object", () => {
-        expect(() => Tuple.prototype.length).toThrow(TypeError);
+    test("length descriptor", () => {
+        const lengthDesc = Object.getOwnPropertyDescriptor(Tuple(), "length");
 
-        const length = Object.getOwnPropertyDescriptor(
-            Tuple.prototype,
-            "length",
-        ).get;
-
-        expect(length.call(Tuple(1, 2))).toBe(2);
-
-        expect(() => length()).toThrow(TypeError);
-        expect(() => length.call({})).toThrow(TypeError);
-        expect(() => length.call([])).toThrow();
+        expect(lengthDesc.value).toBe(0);
+        expect(lengthDesc.enumerable).toBe(false);
+        expect(lengthDesc.configurable).toBe(false);
     });
 });
 
@@ -243,7 +236,7 @@ describe("correct descriptors", () => {
     });
 
     const methods = Reflect.ownKeys(Tuple.prototype).filter(
-        n => n !== "length" && n !== Symbol.toStringTag,
+        n => n !== Symbol.toStringTag,
     );
 
     test.each(methods)("Tuple.prototype.%s", name => {
@@ -252,15 +245,6 @@ describe("correct descriptors", () => {
             enumerable: false,
             configurable: true,
             value: expect.any(Function),
-        });
-    });
-
-    test("Tuple.prototype.length", () => {
-        expect(desc(Tuple.prototype, "length")).toEqual({
-            enumerable: false,
-            configurable: true,
-            get: expect.any(Function),
-            set: undefined,
         });
     });
 

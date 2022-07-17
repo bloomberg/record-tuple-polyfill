@@ -14,10 +14,7 @@
  ** limitations under the License.
  */
 
-import {
-    originalWeakMapSet,
-    originalWeakSetAdd,
-} from "./weakcollections-original";
+import { originalWeakSetAdd } from "./weakcollections-original";
 
 export function isObject(v) {
     return typeof v === "object" && v !== null;
@@ -43,21 +40,18 @@ export function fakeRecordFromEntries(iterable) {
 }
 
 const RECORD_WEAKSET = new WeakSet();
-const TUPLE_WEAKMAP = new WeakMap(); // tuple -> length
+const TUPLE_WEAKSET = new WeakSet();
 export function isRecord(value) {
     return RECORD_WEAKSET.has(value);
 }
 export function isTuple(value) {
-    return TUPLE_WEAKMAP.has(value);
+    return TUPLE_WEAKSET.has(value);
 }
 export function markRecord(value) {
     originalWeakSetAdd.call(RECORD_WEAKSET, value);
 }
-export function markTuple(value, length) {
-    originalWeakMapSet.call(TUPLE_WEAKMAP, value, length);
-}
-export function getTupleLength(value) {
-    return TUPLE_WEAKMAP.get(value);
+export function markTuple(value) {
+    originalWeakSetAdd.call(TUPLE_WEAKSET, value);
 }
 
 function isRecordOrTuple(value) {
