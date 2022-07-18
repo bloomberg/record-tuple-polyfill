@@ -18,6 +18,7 @@ import { InternGraph } from "./interngraph";
 import {
     isObject,
     fakeRecordFromEntries,
+    validateKey,
     validateProperty,
     isRecord,
     markRecord,
@@ -46,14 +47,17 @@ function createRecordFromObject(value) {
     // sort all property names by the order specified by
     // the argument's OwnPropertyKeys internal slot
     // EnumerableOwnPropertyNames - 7.3.22
-    const properties = Object.entries(value)
+    const properties = Reflect.ownKeys(value)
+        .flatMap(k => {
+            const desc = Object.getOwnPropertyDescriptor(value, k);
+            if (!desc.enumerable) return [];
+            return [[validateKey(k), validateProperty(value[k])]];
+        })
         .sort(function([a], [b]) {
             if (a < b) return -1;
             else if (a > b) return 1;
             return 0;
-        })
-        .map(([name, value]) => [name, validateProperty(value)]);
-
+        });
     return RECORD_GRAPH.get(properties);
 }
 

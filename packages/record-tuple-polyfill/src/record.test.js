@@ -34,10 +34,49 @@ test("records cannot contain objects", () => {
 });
 
 test("records doesn't unbox boxed primitives", () => {
-    expect(() => Record({ a: Object(true) })).toThrow(Error); // TODO: TypeError
-    expect(() => Record({ a: Object(1) })).toThrow(Error); // TODO: TypeError
-    expect(() => Record({ a: Object("test") })).toThrow(Error); // TODO: TypeError
-    expect(() => Record({ a: Object(Symbol()) })).toThrow(Error); // TODO: TypeError
+    expect(() => Record({ a: Object(true) })).toThrow(TypeError);
+    expect(() => Record({ a: Object(1) })).toThrow(TypeError);
+    expect(() => Record({ a: Object("test") })).toThrow(TypeError);
+    expect(() => Record({ a: Object(Symbol()) })).toThrow(TypeError);
+});
+
+test("records can't have symbol keys", () => {
+    expect(() => Record({ [Symbol()]: true })).toThrow(TypeError);
+});
+
+test("Record from object only uses enumerable properties", () => {
+    const template = Object.create(null, {
+        [Symbol("non-enumerable-symbol-prop")]: {
+            enumerable: false,
+            value: true,
+        },
+        ["non-enumerable-string-prop"]: {
+            enumerable: false,
+            value: true,
+        },
+        ["non-enumerable-string-getter"]: {
+            enumerable: false,
+            get() {
+                return true;
+            },
+        },
+        ["enumerable-string-prop"]: {
+            enumerable: true,
+            value: true,
+        },
+        ["enumerable-string-getter"]: {
+            enumerable: true,
+            get() {
+                return true;
+            },
+        },
+    });
+    expect(Record(template)).toBe(
+        Record({
+            "enumerable-string-prop": true,
+            "enumerable-string-getter": true,
+        }),
+    );
 });
 
 test("records are correctly identified as records", () => {
@@ -124,12 +163,67 @@ test("Record.fromEntries", () => {
             ["b", {}],
             ["a", 1],
         ]),
-    ).toThrow();
+    ).toThrow(TypeError);
 
     let sym = Symbol();
-    expect(() => Record.fromEntries([[sym, 1]])).toThrow();
+    expect(() => Record.fromEntries([[sym, 1]])).toThrow(TypeError);
     expect(Record.fromEntries([["foo", sym]])).toBe(Record({ foo: sym }));
 });
+
+test("Record.fromEntries validate entries in order", () => {
+    let iteratorCount = 0;
+
+    function countIterable(values) {
+        return {
+            [Symbol.iterator]() {
+                const it = values[Symbol.iterator]();
+                return {
+                    next() {
+                        iteratorCount++;
+                        return it.next();
+                    },
+                };
+            },
+        };
+    }
+
+    // Invalid value: (isPrimitive(value) === false):
+    expect(() => {
+        Record.fromEntries(
+            countIterable([
+                ["valid-key-1", {}],
+                ["valid-key-2", "valid-value"],
+            ]),
+        );
+    }).toThrow(TypeError);
+    expect(iteratorCount).toBe(1);
+    iteratorCount = 0;
+
+    // Invalid symbol key: (typeof key === 'symbol')
+    expect(() => {
+        Record.fromEntries(
+            countIterable([
+                [Symbol("invalid-key"), "valid-value"],
+                ["valid-key-2", "valid-value"],
+            ]),
+        );
+    }).toThrow(TypeError);
+    expect(iteratorCount).toBe(1);
+    iteratorCount = 0;
+
+    // Invalid object key: (toString(key) throws)
+    expect(() => {
+        Record.fromEntries(
+            countIterable([
+                [Object(Symbol("invalid-key")), "valid-value"],
+                ["valid-key-2", "valid-value"],
+            ]),
+        );
+    }).toThrow(TypeError);
+    expect(iteratorCount).toBe(1);
+    iteratorCount = 0;
+});
+
 test("Records work with Object.values", () => {
     expect(Object.values(Record({ a: 1, b: 2 }))).toEqual([1, 2]);
     expect(Object.values(Record({ b: 1, a: 2 }))).toEqual([2, 1]);
