@@ -62,6 +62,7 @@ function createRecordFromObject(value) {
 }
 
 export function Record(value) {
+    if (new.target) throw new TypeError("Record is not a constructor");
     return createRecordFromObject(value);
 }
 // ensure that Record.name is "Record" even if this
@@ -80,10 +81,10 @@ define(Record, {
     },
 });
 
-Record.prototype = Object.create(null);
-define(Record.prototype, {
-    constructor: Record,
-    toString() {
-        return "[record Record]";
-    },
+Record.prototype = null;
+Object.defineProperty(Record, "prototype", {
+    configurable: false,
+    enumerable: false,
+    writable: false,
+    value: null,
 });
