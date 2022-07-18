@@ -81,7 +81,6 @@ define(Record, {
     },
 });
 
-Record.prototype = null;
 Object.defineProperty(Record, "prototype", {
     configurable: false,
     enumerable: false,
