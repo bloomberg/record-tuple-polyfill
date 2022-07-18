@@ -50,7 +50,7 @@ function createRecordFromObject(value) {
     const properties = Reflect.ownKeys(value)
         .flatMap(k => {
             const desc = Object.getOwnPropertyDescriptor(value, k);
-            if (!desc.enumerable) return [];
+            if (!desc || !desc.enumerable) return [];
             return [[validateKey(k), validateProperty(value[k])]];
         })
         .sort(function([a], [b]) {
@@ -62,6 +62,7 @@ function createRecordFromObject(value) {
 }
 
 export function Record(value) {
+    if (new.target) throw new TypeError("Record is not a constructor");
     return createRecordFromObject(value);
 }
 // ensure that Record.name is "Record" even if this
@@ -80,10 +81,9 @@ define(Record, {
     },
 });
 
-Record.prototype = Object.create(null);
-define(Record.prototype, {
-    constructor: Record,
-    toString() {
-        return "[record Record]";
-    },
+Object.defineProperty(Record, "prototype", {
+    configurable: false,
+    enumerable: false,
+    writable: false,
+    value: null,
 });

@@ -16,6 +16,10 @@
 
 import { Record, Tuple } from "./index";
 
+test("Record can not be called as a constructor", () => {
+    expect(() => new Record({})).toThrow(TypeError);
+});
+
 test("Record function throws when presented a non-plain object", () => {
     expect(() => Record(true)).toThrow();
     expect(() => Record(1)).toThrow();
@@ -77,6 +81,21 @@ test("Record from object only uses enumerable properties", () => {
             "enumerable-string-getter": true,
         }),
     );
+});
+
+test("record handles _missing_ property descriptors", () => {
+    expect(
+        Record(
+            new Proxy(
+                { a: 1 },
+                {
+                    ownKeys() {
+                        return ["a", "b"];
+                    },
+                },
+            ),
+        ),
+    ).toBe(Record({ a: 1 }));
 });
 
 test("records are correctly identified as records", () => {
@@ -229,10 +248,6 @@ test("Records work with Object.values", () => {
     expect(Object.values(Record({ b: 1, a: 2 }))).toEqual([2, 1]);
 });
 
-test("Record.prototype.toString", () => {
-    expect(Record({ a: 1 }).toString()).toEqual("[record Record]");
-});
-
 describe("correct descriptors", () => {
     const desc = Object.getOwnPropertyDescriptor;
 
@@ -261,5 +276,15 @@ describe("correct descriptors", () => {
             configurable: true,
             value: 1,
         });
+    });
+});
+
+test("Record.prototype", () => {
+    expect(Record.prototype).toBe(null);
+    expect(Object.getOwnPropertyDescriptor(Record, "prototype")).toEqual({
+        configurable: false,
+        enumerable: false,
+        writable: false,
+        value: null,
     });
 });
