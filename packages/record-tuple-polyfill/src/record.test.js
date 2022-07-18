@@ -83,6 +83,21 @@ test("Record from object only uses enumerable properties", () => {
     );
 });
 
+test("record handles _missing_ property descriptors", () => {
+    expect(
+        Record(
+            new Proxy(
+                { a: 1 },
+                {
+                    ownKeys() {
+                        return ["a", "b"];
+                    },
+                },
+            ),
+        ),
+    ).toBe(Record({ a: 1 }));
+});
+
 test("records are correctly identified as records", () => {
     expect(Record.isRecord(Record({ a: 1 }))).toBe(true);
     expect(Record.isRecord(Tuple(1, 2, 3))).toBe(false);

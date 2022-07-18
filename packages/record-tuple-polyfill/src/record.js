@@ -50,7 +50,7 @@ function createRecordFromObject(value) {
     const properties = Reflect.ownKeys(value)
         .flatMap(k => {
             const desc = Object.getOwnPropertyDescriptor(value, k);
-            if (!desc.enumerable) return [];
+            if (!desc || !desc.enumerable) return [];
             return [[validateKey(k), validateProperty(value[k])]];
         })
         .sort(function([a], [b]) {
