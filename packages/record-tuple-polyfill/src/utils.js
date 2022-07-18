@@ -28,15 +28,11 @@ export function isIterableObject(v) {
 }
 
 export function fakeRecordFromEntries(iterable) {
-    return [...iterable].reduce((obj, [key, val]) => {
-        if (typeof key === "symbol") {
-            throw new TypeError(
-                "A Symbol cannot be used as a property key in a Record.",
-            );
-        }
-        obj[key] = val;
-        return obj;
-    }, {});
+    const retVal = Object.create(null);
+    for (const [key, value] of iterable) {
+        retVal[validateKey(key)] = validateProperty(value);
+    }
+    return retVal;
 }
 
 const RECORD_WEAKSET = new WeakSet();
@@ -57,13 +53,23 @@ export function markTuple(value) {
 function isRecordOrTuple(value) {
     return isRecord(value) || isTuple(value);
 }
+
+export function validateKey(key) {
+    if (typeof key === "symbol") {
+        throw new TypeError(
+            "A Symbol cannot be used as a property key in a Record.",
+        );
+    }
+    return String(key);
+}
+
 export function validateProperty(value) {
     if (isObject(value) && !isRecordOrTuple(value)) {
-        throw new Error(
+        throw new TypeError(
             "TypeError: cannot use an object as a value in a record",
         );
     } else if (isFunction(value)) {
-        throw new Error(
+        throw new TypeError(
             "TypeError: cannot use a function as a value in a record",
         );
     }
