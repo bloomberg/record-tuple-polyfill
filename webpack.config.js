@@ -35,7 +35,18 @@ module.exports = {
                 use: {
                     loader: "babel-loader",
                     options: {
-                        presets: ["@babel/preset-env", "@babel/preset-react"],
+                        targets: "defaults",
+                        presets: [
+                            [
+                                "@babel/preset-env",
+                                {
+                                    exclude: [
+                                        "@babel/plugin-transform-new-target",
+                                    ],
+                                },
+                            ],
+                            "@babel/preset-react",
+                        ],
                     },
                 },
             },

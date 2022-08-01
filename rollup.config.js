@@ -13,8 +13,6 @@
  ** See the License for the specific language governing permissions and
  ** limitations under the License.
  */
-import babel from "rollup-plugin-babel";
-
 function pkg(name, path) {
     if (path) {
         return `packages/${name}/${path}`;
@@ -37,7 +35,6 @@ const POLYFILL_CONFIG = [
                 name: "RecordAndTuple",
             },
         ],
-        plugins: [babel()],
     },
     {
         input: pkg(PKG_NAME, "src/modify-global.js"),
@@ -52,7 +49,6 @@ const POLYFILL_CONFIG = [
                 name: "RecordAndTuple",
             },
         ],
-        plugins: [babel()],
     },
 ];
 

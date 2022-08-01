@@ -8,7 +8,7 @@ const NO_NATIVE_WEAKREF_ERROR =
     "We enabled a shim that will leak memory that reproduces those features.\n\n" +
     "To enable these experimental features natively, go to:\n  https://github.com/bloomberg/record-tuple-polyfill#playground";
 
-globalThis.run = function(source, console) {
+globalThis.run = function(source, console, parentConsole) {
     globalThis.console = console;
 
     if (POLYFILLED_WEAKREF) {
@@ -21,5 +21,6 @@ globalThis.run = function(source, console) {
     return import(/*webpackIgnore: true*/ dataUri).catch(e => {
         console.error(e.message);
         console.error(e);
+        parentConsole.error(e);
     });
 };
