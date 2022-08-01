@@ -313,7 +313,7 @@ class App extends React.Component {
                 this.iframe = document.createElement("iframe");
                 this.iframe.src = "./runner/index.html";
                 this.iframe.onload = () =>
-                    this.iframe.contentWindow.run(this.state.output, this.fakeConsole);
+                    this.iframe.contentWindow.run(this.state.output, this.fakeConsole, globalThis.console);
                 this.iframeContainerRef.current?.appendChild(this.iframe);
             } else {
                 this.iframe.contentWindow.location.reload();
